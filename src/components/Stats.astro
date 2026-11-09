@@ -1,14 +1,16 @@
 ---
-import { stats } from '../data/site';
-interface Props { tone?: 'dark' | 'light' }
-const { tone = 'light' } = Astro.props;
+import { statValues } from '../data/site';
+import { t, fmtNumber, pad, type Lang } from '../i18n';
+interface Props { lang: Lang; tone?: 'dark' | 'light' }
+const { lang, tone = 'light' } = Astro.props;
+const d = t(lang);
 ---
 <ul class:list={['stats', `stats--${tone}`]} role="list" data-reveal="stagger">
-  {stats.map((s, i) => (
+  {statValues.map((s, i) => (
     <li class="stat">
-      <span class="mono stat__i">{String(i + 1).padStart(2, '0')}</span>
-      <p class="stat__n"><span data-count={s.value}>{new Intl.NumberFormat('it-IT').format(s.value)}</span><span class="gold">{s.suffix}</span></p>
-      <p class="stat__l">{s.label}</p>
+      <span class="mono stat__i" aria-hidden="true">{pad(i + 1)}</span>
+      <p class="stat__n"><span data-count={s.value}>{fmtNumber(lang, s.value)}</span><span class="gold">{s.suffix}</span></p>
+      <p class="stat__l">{d.stats[i]}</p>
     </li>
   ))}
 </ul>
@@ -19,14 +21,15 @@ const { tone = 'light' } = Astro.props;
   .stats--dark .stat { border-color: var(--line-dark); }
   .stat:first-child { padding-left: 0; }
   .stat:last-child { border-right: 0; }
-  .stat__i { color: var(--stone); }
+  .stat__i { color: var(--stone-2); }
+  .stats--dark .stat__i { color: rgba(242,237,228,.55); }
   .stat__n {
-    font-size: clamp(2.8rem, 1.6rem + 3.8vw, 5.8rem);
+    font-size: clamp(2.6rem, 1.4rem + 3.8vw, 5.8rem);
     font-weight: 700; font-variation-settings: 'wdth' 112; letter-spacing: -0.05em; line-height: 0.9;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
   }
   .stat__l { font-size: var(--fs-sm); max-width: 22ch; color: var(--stone-2); }
-  .stats--dark .stat__l { color: rgba(242,237,228,.65); }
+  .stats--dark .stat__l { color: rgba(242,237,228,.7); }
   @media (max-width: 860px) {
     .stats { grid-template-columns: 1fr 1fr; row-gap: 2.5rem; }
     .stat:nth-child(2) { border-right: 0; }

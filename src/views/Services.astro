@@ -1,0 +1,155 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Marquee from '../components/Marquee.astro';
+import { images, serviceMedia, suppliers } from '../data/site';
+import { t, path, pad, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const s = d.pages.services;
+const site = Astro.site!;
+const serviceSchema = serviceMedia.map((m, i) => ({
+  '@type': 'Service',
+  name: d.services[i].title,
+  description: d.services[i].body,
+  serviceType: d.services[i].title,
+  url: new URL(path(lang, 'services', m.slug), site).href,
+  provider: { '@id': `${site.href}#organizzazione` },
+  areaServed: ['IT', 'BG', 'FR'],
+}));
+---
+<Base
+  lang={lang}
+  route="services"
+  title={s.metaTitle}
+  description={s.metaDescription}
+  image={images.cantierePlovdiv}
+  breadcrumbs={[{ name: d.nav.services, href: path(lang, 'services') }]}
+  schema={serviceSchema}
+>
+  <PageHero lang={lang} crumb={d.nav.services} eyebrow={s.heroEyebrow} title={s.heroTitle} accent={s.heroAccent} lead={s.heroLead} image={images.betoniera} imageAlt={s.heroImgAlt}>
+    <nav class="toc" aria-label={s.toc} data-hero-in style="--d: 0.85s">
+      {serviceMedia.map((m, i) => (
+        <a href={`#${m.slug}`}><span class="mono" aria-hidden="true">{pad(i + 1)}</span> {d.services[i].title}</a>
+      ))}
+    </nav>
+  </PageHero>
+
+  <section class="section">
+    <div class="container">
+      <SectionHead index="01" eyebrow={s.listEyebrow} title={s.listTitle} accent={s.listAccent} lead={s.listLead} />
+
+      <div class="svc">
+        {serviceMedia.map((m, i) => (
+          <article class:list={['svc__item', { 'svc__item--rev': i % 2 === 1 }]} id={m.slug}>
+            <div class="svc__media">
+              <div class="media svc__img" data-reveal="clip">
+                <div data-parallax="14" class="svc__px"><Img src={m.image} alt={d.services[i].title} sizes="(min-width: 1024px) 50vw, 100vw" /></div>
+              </div>
+            </div>
+            <div class="svc__text">
+              <span class="svc__bignum" aria-hidden="true" data-reveal="fade">{pad(i + 1)}</span>
+              <span class="mono svc__n">{d.ui.service} {pad(i + 1)} / {pad(serviceMedia.length)}</span>
+              <h2 class="h2" data-split>{d.services[i].title}</h2>
+              <p class="lead" data-reveal="up">{d.services[i].short}</p>
+              <p class="muted" data-reveal="up">{d.services[i].body}</p>
+              <ul class="svc__points" role="list" data-reveal="stagger">
+                {d.services[i].points.map((p) => <li><Icon name="check" size={16} /> {p}</li>)}
+              </ul>
+              <a href={path(lang, 'contact', 'preventivo')} class="link-line" data-reveal="up">{d.ui.requestQuote} <Icon name="arrow" size={16} /></a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section theme-dark">
+    <div class="container">
+      <SectionHead index="02" eyebrow={s.extraEyebrow} title={s.extraTitle} accent={s.extraAccent} />
+      <ul class="extra" role="list" data-reveal="stagger">
+        {d.extraServices.map((e, i) => (
+          <li>
+            <span class="mono gold" aria-hidden="true">{pad(serviceMedia.length + i + 1)}</span>
+            <h3 class="h3">{e.title}</h3>
+            <p class="muted">{e.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-bone">
+    <div class="container">
+      <SectionHead index="03" eyebrow={s.stepsEyebrow} title={s.stepsTitle} accent={s.stepsAccent} />
+      <ol class="steps" role="list" data-reveal="stagger">
+        {d.process.map((p, i) => (
+          <li>
+            <span class="steps__n" aria-hidden="true">{pad(i + 1)}</span>
+            <h3 class="h3">{p.title}</h3>
+            <p class="muted">{p.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight suppliers">
+    <div class="container">
+      <h2 class="eyebrow" data-reveal="fade">{s.suppliersEyebrow}</h2>
+      <ul class="sr-only">{suppliers.map((x) => <li>{x}</li>)}</ul>
+    </div>
+    <Marquee items={suppliers} speed={40} tone="light" />
+  </section>
+</Base>
+
+<style>
+  .toc { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; }
+  .toc a {
+    display: inline-flex; gap: 0.6rem; align-items: center; padding: 0.55rem 0.95rem; font-size: var(--fs-sm);
+    border: 1px solid var(--line-dark); border-radius: 999px; transition: background 0.3s, color 0.3s, border-color 0.3s;
+  }
+  .toc a .mono { color: var(--gold-2); }
+  .toc a:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .toc a:hover .mono { color: var(--ink); }
+
+  .svc { display: grid; gap: clamp(5rem, 10vw, 9rem); }
+  .svc__item { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; scroll-margin-top: calc(var(--header-h) + 2rem); }
+  .svc__item--rev .svc__media { order: 2; }
+  .svc__media { position: relative; }
+  .svc__img { aspect-ratio: 4 / 5; }
+  .svc__px { position: absolute; inset: -8% 0; }
+  .svc__px :global(picture), .svc__px :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .svc__bignum {
+    font-size: clamp(4rem, 8vw, 7.5rem); font-weight: 800; font-variation-settings: 'wdth' 125; line-height: 0.8; letter-spacing: -0.06em;
+    color: transparent; -webkit-text-stroke: 1.2px var(--gold); pointer-events: none; margin-bottom: 0.4rem;
+  }
+  .svc__text { display: grid; gap: 1.3rem; justify-items: start; }
+  .svc__n { color: var(--gold-3); }
+  .svc__points { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .svc__points li { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.85rem; background: var(--bone); font-size: var(--fs-sm); font-weight: 550; }
+  .svc__points :global(svg) { color: var(--gold-3); }
+  @media (max-width: 1023px) {
+    .svc__item { grid-template-columns: 1fr; }
+    .svc__item--rev .svc__media { order: 0; }
+    .svc__media { max-width: 620px; }
+  }
+
+  .extra { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+  .extra li { display: grid; gap: 0.9rem; padding-top: 1.5rem; border-top: 1px solid var(--line-dark); align-content: start; }
+  @media (max-width: 860px) { .extra { grid-template-columns: 1fr; } }
+
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gutter); counter-reset: s; }
+  .steps li { display: grid; gap: 0.9rem; align-content: start; padding: 1.8rem; background: var(--paper); border-top: 2px solid var(--gold); }
+  .steps__n { font-size: 3.2rem; font-weight: 750; font-variation-settings: 'wdth' 120; letter-spacing: -0.05em; line-height: 1; color: var(--gold); }
+  .steps p { font-size: var(--fs-sm); }
+  @media (max-width: 1023px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
+
+  .suppliers .eyebrow { margin-bottom: 2rem; }
+</style>

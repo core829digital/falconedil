@@ -16,6 +16,32 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 const $ = <T extends Element = HTMLElement>(s: string, ctx: ParentNode = document) => ctx.querySelector<T>(s as string) as T | null;
 const $$ = <T extends Element = HTMLElement>(s: string, ctx: ParentNode = document) => Array.from(ctx.querySelectorAll<T>(s as string)) as T[];
+const intlLocale = ({ it: 'it-IT', en: 'en-GB', bg: 'bg-BG' } as Record<string, string>)[root.lang] || 'it-IT';
+const numberFmt = new Intl.NumberFormat(intlLocale);
+
+/** Esegue cb una sola volta quando l'elemento sta per entrare nello schermo (più leggero di uno ScrollTrigger). */
+const io = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      const cb = pending.get(e.target);
+      pending.delete(e.target);
+      cb?.();
+    });
+  },
+  { rootMargin: '0px 0px -8% 0px' },
+);
+const pending = new WeakMap<Element, () => void>();
+const onEnter = (el: Element, cb: () => void) => { pending.set(el, cb); io.observe(el); };
+
+/** Cede il controllo al browser tra un blocco di lavoro e l'altro (niente long task). */
+const yieldMain = () =>
+  new Promise<void>((r) => {
+    const sch = (window as unknown as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+    if (sch?.yield) sch.yield().then(r);
+    else window.setTimeout(r, 0);
+  });
 
 gsap.defaults({ ease: 'expo.out', duration: 1.2 });
 
@@ -23,7 +49,8 @@ gsap.defaults({ ease: 'expo.out', duration: 1.2 });
 /* Smooth scroll                                                               */
 /* -------------------------------------------------------------------------- */
 let lenis: Lenis | null = null;
-if (!reduced) {
+// Smooth scroll solo con mouse/trackpad: su touch lo scroll nativo è già fluido e più leggero
+if (!reduced && finePointer) {
   lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, anchors: { offset: -90 } });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis!.raf(t * 1000));
@@ -59,14 +86,18 @@ function initMenu() {
   const header = $('[data-header]');
   if (!btn || !menu || !header) return;
   const links = $$('.menu__list a', menu);
+  const outside = $$('main, footer, .dock, .wa, .skip-link');
+  const brand = $('.brand', header);
   let open = false;
 
   const set = (state: boolean) => {
     open = state;
     btn.setAttribute('aria-expanded', String(state));
-    btn.querySelector('.sr-only')!.textContent = state ? 'Chiudi il menu' : 'Apri il menu';
+    btn.querySelector('.sr-only')!.textContent = (state ? btn.dataset.labelClose : btn.dataset.labelOpen) || '';
     header.classList.toggle('menu-open', state);
     root.classList.toggle('menu-locked', state);
+    outside.forEach((el) => (el.inert = state));
+    if (brand) brand.inert = state;
     if (state) {
       menu.hidden = false;
       lenis?.stop();
@@ -85,7 +116,17 @@ function initMenu() {
     }
   };
   btn.addEventListener('click', () => set(!open));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) { set(false); btn.focus(); } });
+  document.addEventListener('keydown', (e) => {
+    if (!open) return;
+    if (e.key === 'Escape') { set(false); btn.focus(); return; }
+    if (e.key === 'Tab') {
+      // Focus trap: il focus resta tra il pulsante e le voci del menu
+      const items = [btn, ...$$<HTMLElement>('a, button', menu)];
+      const i = items.indexOf(document.activeElement as HTMLElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (!e.shiftKey && i === items.length - 1) { e.preventDefault(); items[0].focus(); }
+    }
+  });
   links.forEach((a) => a.addEventListener('click', () => open && set(false)));
   window.matchMedia('(min-width: 961px)').addEventListener('change', (e) => { if (e.matches && open) set(false); });
 }
@@ -95,23 +136,18 @@ function initMenu() {
 /* -------------------------------------------------------------------------- */
 function initSplits() {
   $$('[data-split]').forEach((el) => {
-    const isHero = el.hasAttribute('data-split-hero');
-    gsap.set(el, { opacity: 1 });
-    SplitText.create(el, {
-      type: 'lines',
-      mask: 'lines',
-      linesClass: 'split-line',
-      autoSplit: true,
-      onSplit(self) {
-        return gsap.from(self.lines, {
-          yPercent: 110,
-          rotate: 2,
-          duration: 1.4,
-          stagger: 0.09,
-          delay: isHero ? heroDelay() : 0,
-          scrollTrigger: isHero ? undefined : { trigger: el, start: 'top 88%', once: true },
-        });
-      },
+    onEnter(el, () => {
+      gsap.set(el, { opacity: 1 });
+      SplitText.create(el, {
+        type: 'lines',
+        mask: 'lines',
+        linesClass: 'split-line',
+        autoSplit: true,
+        aria: 'none', // le righe restano testo leggibile: nessun aria-label su <p>/<h*>
+        onSplit(self) {
+          return gsap.from(self.lines, { yPercent: 110, rotate: 2, duration: 1.4, stagger: 0.09 });
+        },
+      });
     });
   });
 }
@@ -122,23 +158,24 @@ function initSplits() {
 function initReveals() {
   $$('[data-reveal]').forEach((el) => {
     const type = el.dataset.reveal;
-    const delay = parseFloat(el.dataset.delay || '0') + (el.hasAttribute('data-hero') ? heroDelay() : 0);
-    const st = el.hasAttribute('data-hero') ? undefined : { trigger: el, start: 'top 90%', once: true };
-    if (type === 'clip') {
-      const img = el.querySelector('img');
-      const tl = gsap.timeline({ scrollTrigger: st, delay });
-      tl.to(el, { clipPath: 'inset(0% 0 0 0)', duration: 1.5, ease: 'expo.inOut' });
-      if (img) tl.from(img, { scale: 1.35, duration: 2, ease: 'expo.out' }, 0.1);
-    } else if (type === 'stagger') {
-      gsap.set(el, { opacity: 1 });
-      gsap.from(el.children, { y: 40, opacity: 0, duration: 1.2, stagger: 0.08, delay, scrollTrigger: st });
-    } else if (type === 'line') {
-      gsap.fromTo(el, { opacity: 1, scaleX: 0 }, { scaleX: 1, transformOrigin: 'left', duration: 1.6, ease: 'expo.inOut', delay, scrollTrigger: st });
-    } else if (type === 'fade') {
-      gsap.to(el, { opacity: 1, duration: 1.4, ease: 'power2.out', delay, scrollTrigger: st });
-    } else {
-      gsap.fromTo(el, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.3, delay, scrollTrigger: st });
-    }
+    const delay = parseFloat(el.dataset.delay || '0');
+    onEnter(el, () => {
+      if (type === 'clip') {
+        const img = el.querySelector('img');
+        const tl = gsap.timeline({ delay });
+        tl.to(el, { clipPath: 'inset(0% 0 0 0)', duration: 1.5, ease: 'expo.inOut' });
+        if (img) tl.from(img, { scale: 1.35, duration: 2, ease: 'expo.out' }, 0.1);
+      } else if (type === 'stagger') {
+        gsap.set(el, { opacity: 1 });
+        gsap.from(el.children, { y: 40, opacity: 0, duration: 1.2, stagger: 0.08, delay });
+      } else if (type === 'line') {
+        gsap.fromTo(el, { opacity: 1, scaleX: 0 }, { scaleX: 1, transformOrigin: 'left', duration: 1.6, ease: 'expo.inOut', delay });
+      } else if (type === 'fade') {
+        gsap.to(el, { opacity: 1, duration: 1.4, ease: 'power2.out', delay });
+      } else {
+        gsap.fromTo(el, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.3, delay });
+      }
+    });
   });
 }
 
@@ -164,17 +201,17 @@ function initParallax() {
 /* Contatori                                                                   */
 /* -------------------------------------------------------------------------- */
 function initCounters() {
-  const fmt = new Intl.NumberFormat('it-IT');
   $$('[data-count]').forEach((el) => {
     const end = parseFloat(el.dataset.count || '0');
-    const obj = { v: 0 };
-    el.textContent = '0';
-    gsap.to(obj, {
-      v: end,
-      duration: 2.4,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-      onUpdate: () => { el.textContent = fmt.format(Math.round(obj.v)); },
+    onEnter(el, () => {
+      const obj = { v: 0 };
+      el.textContent = '0';
+      gsap.to(obj, {
+        v: end,
+        duration: 2.4,
+        ease: 'power3.out',
+        onUpdate: () => { el.textContent = numberFmt.format(Math.round(obj.v)); },
+      });
     });
   });
 }
@@ -295,6 +332,7 @@ function initLoader() {
       if (bar) bar.style.transform = `scaleX(${obj.p / 100})`;
     } }, 0.1)
     .to('.loader__center', { opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' }, '+=0.1')
+    .add(() => { $$('[data-hero-in], [data-hero-title]').forEach((el) => (el.style.animationPlayState = 'running')); }, '-=0.1')
     .to('.loader__panel', { clipPath: 'inset(0 0 100% 0)', duration: 1, ease: 'expo.inOut' }, '-=0.15');
   loaderDone = false;
   gsap.delayedCall(1.9, () => { loaderDone = true; });
@@ -459,7 +497,7 @@ function initDraw() {
 function initFooterWord() {
   const w = $('[data-footer-word]');
   if (!w) return;
-  const split = SplitText.create(w.children, { type: 'chars' });
+  const split = SplitText.create(w.children, { type: 'chars', aria: 'none' });
   gsap.from(split.chars, {
     yPercent: 100,
     opacity: 0,
@@ -525,6 +563,10 @@ function initForm() {
   const status = $('[data-form-status]', form)!;
   const endpoint = form.dataset.endpoint || '';
   const to = form.dataset.mailto || 'info@falconedil.com';
+  const m = JSON.parse(form.dataset.messages || '{}') as {
+    invalid: string; sent: string; failed: string; mailto: string; subject: string;
+    labels: { name: string; email: string; phone: string; type: string; location: string };
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -534,7 +576,7 @@ function initForm() {
       form.classList.add('was-validated');
       const first = form.querySelector<HTMLElement>(':invalid');
       first?.focus();
-      status.textContent = 'Controlla i campi evidenziati.';
+      status.textContent = m.invalid;
       status.classList.add('is-error');
       return;
     }
@@ -542,11 +584,11 @@ function initForm() {
     if (data.get('azienda_web')) return; // honeypot
 
     const lines = [
-      `Nome: ${data.get('nome')} ${data.get('cognome')}`,
-      `Email: ${data.get('email')}`,
-      `Telefono: ${data.get('telefono') || '—'}`,
-      `Intervento: ${data.get('intervento') || '—'}`,
-      `Località: ${data.get('localita') || '—'}`,
+      `${m.labels.name}: ${data.get('nome')} ${data.get('cognome')}`,
+      `${m.labels.email}: ${data.get('email')}`,
+      `${m.labels.phone}: ${data.get('telefono') || '—'}`,
+      `${m.labels.type}: ${data.get('intervento') || '—'}`,
+      `${m.labels.location}: ${data.get('localita') || '—'}`,
       '',
       String(data.get('messaggio') || ''),
     ];
@@ -558,7 +600,7 @@ function initForm() {
       try {
         const payload: Record<string, string> = {};
         data.forEach((v, k) => (payload[k] = String(v)));
-        payload.subject = `Richiesta preventivo dal sito — ${payload.nome} ${payload.cognome}`;
+        payload.subject = `${m.subject} — ${payload.nome} ${payload.cognome}`;
         if (form.dataset.accessKey) payload.access_key = form.dataset.accessKey;
         const res = await fetch(endpoint, {
           method: 'POST',
@@ -568,22 +610,36 @@ function initForm() {
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
         form.classList.remove('was-validated');
-        status.textContent = 'Grazie! Abbiamo ricevuto la tua richiesta: ti ricontatteremo al più presto.';
+        status.textContent = m.sent;
         status.classList.add('is-ok');
       } catch {
-        status.textContent = 'Invio non riuscito. Scrivici a info@falconedil.com o su WhatsApp.';
+        status.textContent = m.failed;
         status.classList.add('is-error');
       } finally {
         btn.disabled = false;
         btn.removeAttribute('aria-busy');
       }
     } else {
-      const subject = `Richiesta preventivo dal sito — ${data.get('nome')} ${data.get('cognome')}`;
+      const subject = `${m.subject} — ${data.get('nome')} ${data.get('cognome')}`;
       window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
-      status.textContent = 'Si sta aprendo il tuo programma di posta con il messaggio già compilato: premi “Invia” per completare.';
+      status.textContent = m.mailto;
       status.classList.add('is-ok');
     }
   });
+}
+
+/* -------------------------------------------------------------------------- */
+/* WhatsApp: suggerimento mostrato una sola volta per sessione                */
+/* -------------------------------------------------------------------------- */
+function initWhatsappHint() {
+  const wa = $('[data-wa]');
+  if (!wa || !window.matchMedia('(min-width: 721px)').matches) return;
+  try { if (sessionStorage.getItem('fe-wa-hint')) return; } catch (e) { /* noop */ }
+  window.setTimeout(() => {
+    wa.classList.add('is-hinting');
+    try { sessionStorage.setItem('fe-wa-hint', '1'); } catch (e) { /* noop */ }
+    window.setTimeout(() => wa.classList.remove('is-hinting'), 4200);
+  }, 7000);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -596,29 +652,38 @@ function boot() {
   initForm();
   initBeforeAfter();
   initFilters();
+  initWhatsappHint();
 
   if (reduced) {
-    $$('[data-count]').forEach((el) => { el.textContent = new Intl.NumberFormat('it-IT').format(parseFloat(el.dataset.count || '0')); });
+    $$('[data-count]').forEach((el) => { el.textContent = numberFmt.format(parseFloat(el.dataset.count || '0')); });
     return;
   }
 
+  // Critico (sopra la piega): subito
   initLoader();
-  initCursor();
-  initMagnetic();
   initHero();
   initReveals();
-  initParallax();
   initCounters();
-  initMarquees();
-  initHoverList();
-  initHScroll();
-  initDraw();
-  initFooterWord();
 
-  document.fonts.ready.then(() => {
-    initSplits();
+  // Il resto a piccoli blocchi, cedendo il thread al browser tra uno e l'altro
+  const tasks: (() => void | Promise<unknown>)[] = [
+    () => document.fonts.ready.then(initSplits),
+    initCursor,
+    initMagnetic,
+    initMarquees,
+    initHoverList,
+    initParallax,
+    initHScroll,
+    initDraw,
+    initFooterWord,
+  ];
+  (async () => {
+    for (const task of tasks) {
+      await yieldMain();
+      await task();
+    }
     ScrollTrigger.refresh();
-  });
+  })();
   window.addEventListener('load', () => ScrollTrigger.refresh());
 }
 

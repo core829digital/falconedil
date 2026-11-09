@@ -1,0 +1,134 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import { images, projectMedia, galleryMedia } from '../data/site';
+import { t, path, pad, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const p = d.pages.projects;
+const done = projectMedia.filter((x) => x.status === 'completato').length;
+const live = projectMedia.length - done;
+---
+<Base
+  lang={lang}
+  route="projects"
+  title={p.metaTitle}
+  description={p.metaDescription}
+  image={images.condominioDopo}
+  breadcrumbs={[{ name: d.nav.projects, href: path(lang, 'projects') }]}
+>
+  <PageHero lang={lang} crumb={d.nav.projects} eyebrow={p.heroEyebrow} title={p.heroTitle} accent={p.heroAccent} lead={p.heroLead} image={images.operativita} imageAlt={p.heroImgAlt}>
+    <dl class="phero-stats" data-hero-in style="--d: 0.85s">
+      <div><dt class="mono">{p.statsDone}</dt><dd>{pad(done)}</dd></div>
+      <div><dt class="mono">{p.statsLive}</dt><dd>{pad(live)}</dd></div>
+      <div><dt class="mono">{p.statsCountries}</dt><dd>03</dd></div>
+    </dl>
+  </PageHero>
+
+  <section class="section">
+    <div class="container">
+      <SectionHead index="01" eyebrow={p.listEyebrow} title={p.listTitle} accent={p.listAccent} />
+
+      <div class="filters" role="group" aria-label={p.filterLabel} data-filter-bar data-reveal="up">
+        <button type="button" data-filter="tutti" aria-pressed="true">{p.filterAll} <span class="mono">{projectMedia.length}</span></button>
+        <button type="button" data-filter="completato" aria-pressed="false">{p.filterDone} <span class="mono">{done}</span></button>
+        <button type="button" data-filter="in-corso" aria-pressed="false">{p.filterLive} <span class="mono">{live}</span></button>
+      </div>
+
+      <ul class="pgrid" role="list">
+        {projectMedia.map((m, i) => (
+          <li class:list={['pcard', { 'pcard--wide': i % 5 === 0 }]} data-filter-item={m.status} data-reveal="up" data-delay={String((i % 2) * 0.08)}>
+            <figure>
+              <div class="media pcard__img" data-cursor-text={d.projects[i].place}>
+                <Img src={m.image} alt={`${d.projects[i].title} — ${d.projects[i].place}, ${d.projects[i].country}`} sizes={i % 5 === 0 ? '100vw' : '(min-width: 900px) 50vw, 100vw'} widths={[480, 768, 1080, 1440]} />
+                <span class:list={['pcard__status mono', { 'is-live': m.status === 'in-corso' }]}>
+                  {m.status === 'in-corso' ? d.ui.ongoing : d.ui.completed}
+                </span>
+              </div>
+              <figcaption class="pcard__cap">
+                <div>
+                  <p class="mono pcard__cat">{d.projects[i].category}</p>
+                  <h2 class="h3">{d.projects[i].title}</h2>
+                </div>
+                <p class="pcard__place"><Icon name="pin" size={16} /> {d.projects[i].place} <span class="muted">({d.projects[i].country})</span></p>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-dark">
+    <div class="container">
+      <SectionHead index="02" eyebrow={p.baEyebrow} title={p.baTitle} accent={p.baAccent} lead={p.baLead} />
+      <div class="ba-grid">
+        <BeforeAfter lang={lang} id="ba-prj-1" before={images.lastricoPrima} after={images.lastricoDopo} title={d.projects[0].title} place={`${d.projects[0].place} (${d.projects[0].country})`} />
+        <BeforeAfter lang={lang} id="ba-prj-2" before={images.condominioPrima} after={images.condominioDopo} title={d.projects[1].title} place={`${d.projects[1].place} (${d.projects[1].country})`} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section theme-bone">
+    <div class="container">
+      <SectionHead index="03" eyebrow={p.galleryEyebrow} title={p.galleryTitle} accent={p.galleryAccent} />
+      <ul class="gallery" role="list">
+        {galleryMedia.map((g, i) => (
+          <li class="media gallery__item" data-reveal="clip" data-delay={String((i % 3) * 0.1)}>
+            <Img src={g} alt={d.gallery[i]} sizes="(min-width: 900px) 33vw, 50vw" widths={[480, 768, 1080]} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .phero-stats { display: flex; gap: clamp(1.5rem, 4vw, 4rem); margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--line-dark); }
+  .phero-stats dt { color: rgba(242,237,228,.6); }
+  .phero-stats dd { font-size: clamp(2.2rem, 1.5rem + 2vw, 3.4rem); font-weight: 700; font-variation-settings: 'wdth' 115; letter-spacing: -0.04em; line-height: 1; margin-top: 0.4rem; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .filters button {
+    display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.2rem; border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line-light); font-size: var(--fs-sm); font-weight: 600;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .filters button .mono { color: var(--gold-3); }
+  .filters button:hover { box-shadow: inset 0 0 0 1px var(--ink); }
+  .filters button[aria-pressed='true'] { background: var(--ink); color: var(--bone); box-shadow: none; }
+  .filters button[aria-pressed='true'] .mono { color: var(--gold-2); }
+
+  .pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(2.5rem, 5vw, 4.5rem) var(--gutter); }
+  .pcard[hidden] { display: none; }
+  .pcard figure { display: grid; gap: 1.2rem; }
+  .pcard__img { aspect-ratio: 4 / 3; }
+  .pcard--wide { grid-column: 1 / -1; }
+  .pcard--wide .pcard__img { aspect-ratio: 21 / 9; }
+  .pcard__img :global(img) { transition: transform 1.4s var(--ease-out); }
+  .pcard:hover .pcard__img :global(img) { transform: scale(1.05); }
+  .pcard__status { position: absolute; left: 1rem; top: 1rem; padding: 0.45rem 0.75rem; background: rgba(15,14,12,.78); color: var(--bone); display: inline-flex; align-items: center; gap: 0.5rem; }
+  .pcard__status.is-live { background: var(--gold); color: var(--ink); }
+  .pcard__status.is-live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+  .pcard__cap { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; padding-bottom: 1.2rem; border-bottom: 1px solid var(--line-light); }
+  .pcard__cat { color: var(--gold-3); margin-bottom: 0.4rem; }
+  .pcard__place { display: inline-flex; align-items: center; gap: 0.4rem; font-size: var(--fs-sm); font-weight: 550; }
+  @media (max-width: 800px) {
+    .pgrid { grid-template-columns: 1fr; }
+    .pcard--wide .pcard__img { aspect-ratio: 4 / 3; }
+  }
+
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); }
+  @media (max-width: 800px) { .ba-grid { grid-template-columns: 1fr; } }
+
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .gallery__item { aspect-ratio: 3 / 4; }
+  .gallery__item:nth-child(3n + 2) { transform: translateY(clamp(0rem, 4vw, 3rem)); }
+  @media (max-width: 700px) { .gallery { grid-template-columns: 1fr 1fr; } .gallery__item:nth-child(3n + 2) { transform: none; } }
+</style>

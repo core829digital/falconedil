@@ -2,23 +2,24 @@
 import type { ImageMetadata } from 'astro';
 import Img from './Img.astro';
 import Icon from './Icon.astro';
-interface Props { before: ImageMetadata; after: ImageMetadata; title: string; place: string; ratio?: string; }
-const { before, after, title, place, ratio = '4 / 5' } = Astro.props;
-const id = `ba-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+import { t, type Lang } from '../i18n';
+interface Props { lang: Lang; before: ImageMetadata; after: ImageMetadata; title: string; place: string; ratio?: string; id: string }
+const { lang, before, after, title, place, ratio = '4 / 5', id } = Astro.props;
+const d = t(lang);
 ---
-<figure class="ba" data-ba style={`--ratio: ${ratio}`} data-cursor-text="Trascina">
+<figure class="ba" data-ba style={`--ratio: ${ratio}`} data-cursor-text={d.ui.drag}>
   <div class="ba__stage">
-    <div class="ba__img ba__after"><Img src={after} alt={`${title}, ${place} — dopo l’intervento`} sizes="(min-width: 900px) 45vw, 100vw" /></div>
-    <div class="ba__img ba__before"><Img src={before} alt={`${title}, ${place} — prima dell’intervento`} sizes="(min-width: 900px) 45vw, 100vw" /></div>
-    <span class="ba__tag ba__tag--l mono">Prima</span>
-    <span class="ba__tag ba__tag--r mono">Dopo</span>
+    <div class="ba__img ba__after"><Img src={after} alt={`${title}, ${place} — ${d.ui.afterAlt}`} sizes="(min-width: 900px) 45vw, 100vw" /></div>
+    <div class="ba__img ba__before"><Img src={before} alt={`${title}, ${place} — ${d.ui.beforeAlt}`} sizes="(min-width: 900px) 45vw, 100vw" /></div>
+    <span class="ba__tag ba__tag--l mono" aria-hidden="true">{d.ui.before}</span>
+    <span class="ba__tag ba__tag--r mono" aria-hidden="true">{d.ui.after}</span>
     <div class="ba__handle" aria-hidden="true"><span><Icon name="drag" size={18} /></span></div>
-    <label class="sr-only" for={id}>Confronta prima e dopo: {title}</label>
-    <input id={id} type="range" min="0" max="100" value="50" step="0.5" />
+    <label class="sr-only" for={id}>{d.ui.compare}: {title}</label>
+    <input id={id} type="range" min="0" max="100" value="50" step="1" />
   </div>
   <figcaption class="ba__cap">
     <span class="h3">{title}</span>
-    <span class="mono muted">{place}</span>
+    <span class="mono ba__place">{place}</span>
   </figcaption>
 </figure>
 <style>
@@ -34,9 +35,11 @@ const id = `ba-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   .ba input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
-  .ba input:focus-visible ~ .ba__handle span, .ba__stage:focus-within .ba__handle span { outline: 2px solid var(--bone); outline-offset: 3px; }
-  .ba__tag { position: absolute; top: 1rem; padding: 0.4rem 0.7rem; background: rgba(15,14,12,.7); color: var(--bone); pointer-events: none; }
+  .ba input:focus-visible ~ .ba__handle span { outline: 2px solid var(--bone); outline-offset: 3px; }
+  .ba__stage:has(input:focus-visible) .ba__handle span { outline: 2px solid var(--bone); outline-offset: 3px; }
+  .ba__tag { position: absolute; top: 1rem; padding: 0.4rem 0.7rem; background: rgba(15,14,12,.75); color: var(--bone); pointer-events: none; }
   .ba__tag--l { left: 1rem; }
   .ba__tag--r { right: 1rem; background: var(--gold); color: var(--ink); }
   .ba__cap { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+  .ba__place { color: rgba(242,237,228,.7); }
 </style>

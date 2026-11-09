@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { t, path, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const n = d.pages.notFound;
+---
+<Base lang={lang} route={null} title={n.metaTitle} description={n.metaDescription} noindex>
+  <section class="nf theme-dark">
+    <div class="container nf__in">
+      <p class="eyebrow">{n.eyebrow}</p>
+      <h1 class="display" data-hero-title>{n.title}<br /><span class="serif gold">{n.accent}</span></h1>
+      <p class="lead nf__lead">{n.lead}</p>
+      <div class="nf__ctas">
+        <a href={path(lang, 'home')} class="btn btn--gold"><span>{n.home}</span><span class="btn__icon"><Icon name="arrow" size={18} /></span></a>
+        <a href={path(lang, 'projects')} class="btn btn--ghost"><span>{d.nav.projects}</span></a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .nf { min-height: 100svh; display: flex; align-items: center; padding-top: var(--header-h); padding-bottom: 4rem; }
+  .nf__in { display: grid; gap: 1.6rem; }
+  .nf__lead { color: rgba(242,237,228,.75); }
+  .nf__ctas { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+</style>

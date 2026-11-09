@@ -1,8 +1,10 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Img from './Img.astro';
-interface Props { eyebrow: string; title: string; accent?: string; lead?: string; image: ImageMetadata; imageAlt: string; crumb: string; }
-const { eyebrow, title, accent, lead, image, imageAlt, crumb } = Astro.props;
+import { t, path, type Lang } from '../i18n';
+interface Props { lang: Lang; eyebrow: string; title: string; accent?: string; lead?: string; image: ImageMetadata; imageAlt: string; crumb: string; }
+const { lang, eyebrow, title, accent, lead, image, imageAlt, crumb } = Astro.props;
+const d = t(lang);
 ---
 <section class="phero theme-dark" data-hero-section>
   <div class="phero__media" data-hero-media>
@@ -15,12 +17,12 @@ const { eyebrow, title, accent, lead, image, imageAlt, crumb } = Astro.props;
     <span data-draw-line class="h" style="top: 72%"></span>
   </div>
   <div class="container phero__content" data-hero-content>
-    <nav aria-label="Percorso" class="phero__crumb mono" data-reveal="fade" data-hero>
-      <a href="/">Home</a> <span aria-hidden="true">/</span> <span aria-current="page">{crumb}</span>
+    <nav aria-label={d.ui.breadcrumb} class="phero__crumb mono" data-hero-in style="--d: 0.1s">
+      <a href={path(lang, 'home')}>{d.ui.home}</a> <span aria-hidden="true">/</span> <span aria-current="page">{crumb}</span>
     </nav>
-    <p class="eyebrow" data-reveal="fade" data-hero data-delay="0.2">{eyebrow}</p>
-    <h1 class="h1" data-split data-split-hero>{title}{accent && <> <span class="serif gold">{accent}</span></>}</h1>
-    {lead && <p class="lead phero__lead" data-reveal="up" data-hero data-delay="0.5">{lead}</p>}
+    <p class="eyebrow" data-hero-in style="--d: 0.35s">{eyebrow}</p>
+    <h1 class="h1" data-hero-title>{title}{accent && <> <span class="serif gold">{accent}</span></>}</h1>
+    {lead && <p class="lead phero__lead" data-hero-in style="--d: 0.65s">{lead}</p>}
     <slot />
   </div>
 </section>

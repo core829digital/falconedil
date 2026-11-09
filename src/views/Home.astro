@@ -1,0 +1,603 @@
+---
+import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Marquee from '../components/Marquee.astro';
+import Stats from '../components/Stats.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Faq from '../components/Faq.astro';
+import { images, serviceMedia, guaranteeMedia, projectMedia, leadershipMedia, offices, company } from '../data/site';
+import { t, path, pad, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const h = d.pages.home;
+
+const slideImages = [images.cantierePlovdiv, images.condominioDopo, images.cantiereTrinitapoli, images.operativita];
+const slides = slideImages.map((image, i) => ({ image, ...h.slides[i] }));
+const wa = `https://wa.me/${company.whatsapp}?text=${encodeURIComponent(d.ui.whatsappMessage)}`;
+const [heroOffA, heroOffB] = lang === 'bg' ? [offices[1], offices[0]] : [offices[0], offices[1]];
+
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: d.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: [...f.a, ...f.list.map(([a, b]) => `${a}: ${b}`), f.after].filter(Boolean).join(' '),
+    },
+  })),
+};
+---
+<Base lang={lang} route="home" title={h.metaTitle} description={h.metaDescription} preloader schema={[faqSchema]}>
+  <!-- ============================== HERO ============================== -->
+  <section class="hero theme-dark" data-hero-section>
+    <div class="hero__media" data-hero-media>
+      {slides.map((s, i) => (
+        <div class="hero__slide" data-hero-slide data-caption={s.caption}>
+          <Img src={s.image} alt={s.alt} priority={i === 0} sizes="100vw" widths={[480, 768, 1080, 1440, 1920]} />
+        </div>
+      ))}
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+
+    <div class="hero__grid" aria-hidden="true">
+      <span data-draw-line class="v" style="left: 25%"></span>
+      <span data-draw-line class="v" style="left: 50%"></span>
+      <span data-draw-line class="v" style="left: 75%"></span>
+      <span data-draw-line class="h" style="top: 30%"></span>
+    </div>
+
+    <div class="hero__coords mono" aria-hidden="true" data-hero-in style="--d: 0.75s">
+      <span>{heroOffA.coordsLabel}</span>
+      <span>{heroOffB.coordsLabel}</span>
+    </div>
+
+    <div class="container hero__content" data-hero-content>
+      <p class="eyebrow" data-hero-in style="--d: 0.1s">{h.heroEyebrow}</p>
+      <h1 class="display hero__title" data-hero-title>
+        {h.heroTitle[0]}<br /> {h.heroTitle[1]}
+      </h1>
+      <div class="hero__row">
+        <p class="hero__sub hero__fadein">
+          <span class="serif gold">{h.heroAccent}</span>
+          {h.heroLead}
+        </p>
+        <div class="hero__ctas" data-hero-in style="--d: 0.75s">
+          <a href={path(lang, 'contact', 'preventivo')} class="btn btn--gold" data-magnetic>
+            <span>{d.ui.requestQuote}</span>
+            <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+          </a>
+          <a href={path(lang, 'projects')} class="btn btn--ghost" data-magnetic><span>{h.heroCtaProjects}</span></a>
+        </div>
+      </div>
+
+      <div class="hero__bottom" data-hero-in style="--d: 0.95s">
+        <div class="hero__slideinfo" aria-hidden="true">
+          <span class="mono"><span data-hero-index>01</span> / {pad(slides.length)}</span>
+          <span class="hero__progress"><span data-hero-progress></span></span>
+          <span class="mono hero__caption" data-hero-caption>{slides[0].caption}</span>
+        </div>
+        <a href="#chi-siamo" class="hero__scroll mono">
+          <span>{d.ui.scroll}</span>
+          <span class="hero__scroll-line" aria-hidden="true"></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Marquee tone="gold" items={d.marquee} speed={45} />
+
+  <!-- ============================== CHI SIAMO ============================== -->
+  <section class="section about" id="chi-siamo">
+    <div class="container about__grid">
+      <div class="about__media">
+        <div class="media about__img" data-reveal="clip">
+          <Img src={images.emanueleFalcone2} alt={h.aboutImgAlt} sizes="(min-width: 1024px) 40vw, 100vw" />
+        </div>
+        <div class="about__badge" data-reveal="up" data-delay="0.3">
+          <span class="about__badge-n">16<span class="gold">+</span></span>
+          <span class="mono">{h.badge[0]}<br />{h.badge[1]}</span>
+        </div>
+        <p class="about__sign" data-reveal="fade">
+          <span class="serif">{company.founder}</span>
+          <span class="mono muted">{d.company.founderRole}</span>
+        </p>
+      </div>
+
+      <div class="about__text">
+        <p class="eyebrow" data-reveal="fade">{h.aboutEyebrow}</p>
+        <h2 class="h2" data-split>{h.aboutTitle} <span class="serif gold">{h.aboutAccent}</span></h2>
+        <div class="prose about__lead" data-reveal="up">
+          <p>{h.aboutP1}</p>
+          <p class="muted">{h.aboutP2}</p>
+        </div>
+
+        <ol class="pillars" role="list">
+          {d.pillars.map((p, i) => (
+            <li class="pillar" data-reveal="up" data-delay={String(i * 0.06)}>
+              <span class="mono pillar__n" aria-hidden="true">{pad(i + 1)}</span>
+              <div>
+                <h3 class="pillar__t">{p.title}</h3>
+                <p class="muted">{p.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <blockquote class="about__quote" data-reveal="up">
+          <p class="serif">{h.quote}</p>
+        </blockquote>
+
+        <div class="about__ctas" data-reveal="up">
+          <a href={path(lang, 'about')} class="btn" data-magnetic>
+            <span>{h.aboutCta}</span>
+            <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+          </a>
+          <a href={path(lang, 'contact')} class="link-line">{h.workWithUs} <Icon name="arrow-up-right" size={16} /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== NUMERI ============================== -->
+  <section class="section section--tight theme-dark numbers">
+    <div class="container">
+      <div class="numbers__head">
+        <p class="eyebrow" data-reveal="fade">{h.numbersEyebrow}</p>
+        <p class="h3 numbers__claim" data-split>{h.numbersClaim} <span class="serif gold">{h.numbersAccent}</span></p>
+      </div>
+      <Stats lang={lang} tone="dark" />
+    </div>
+  </section>
+
+  <!-- ============================== SERVIZI ============================== -->
+  <section class="section services" id="servizi">
+    <div class="container">
+      <SectionHead index="01" eyebrow={h.servicesEyebrow} title={h.servicesTitle} accent={h.servicesAccent} lead={h.servicesLead} />
+
+      <div class="slist" data-hover-list>
+        <ul role="list">
+          {serviceMedia.map((s, i) => (
+            <li data-hover-item>
+              <a href={path(lang, 'services', s.slug)} class="slist__row" data-cursor-text={d.ui.discover}>
+                <span class="mono slist__n" aria-hidden="true">{pad(i + 1)}</span>
+                <span class="slist__thumb media" aria-hidden="true"><Img src={s.image} alt="" sizes="96px" widths={[192]} /></span>
+                <span class="slist__t">{d.services[i].title}</span>
+                <span class="slist__d">{d.services[i].short}</span>
+                <span class="slist__arrow" aria-hidden="true"><Icon name="arrow-up-right" size={22} /></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="slist__float" data-hover-float aria-hidden="true">
+          {serviceMedia.map((s) => (
+            <div class="slist__float-img" data-hover-img><Img src={s.image} alt="" sizes="360px" widths={[480, 720]} /></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== GARANZIE ============================== -->
+  <section class="section theme-bone guarantees">
+    <div class="container">
+      <SectionHead index="02" eyebrow={h.guaranteesEyebrow} title={h.guaranteesTitle} accent={h.guaranteesAccent} lead={h.guaranteesLead} />
+      <ul class="gcards" role="list">
+        {guaranteeMedia.map((img, i) => (
+          <li class="gcard" data-reveal="up" data-delay={String((i % 3) * 0.08)}>
+            <div class="media gcard__img">
+              <Img src={img} alt="" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" widths={[480, 768, 1080]} />
+            </div>
+            <div class="gcard__body">
+              <span class="mono gcard__n" aria-hidden="true">{pad(i + 1)}</span>
+              <h3 class="h3">{d.guarantees[i].title}</h3>
+              <p class="muted">{d.guarantees[i].body}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== PRIMA / DOPO ============================== -->
+  <section class="section theme-dark ba-sec">
+    <div class="container">
+      <SectionHead index="03" eyebrow={h.baEyebrow} title={h.baTitle} accent={h.baAccent} lead={h.baLead} />
+      <div class="ba-grid">
+        <BeforeAfter lang={lang} id="ba-home-1" before={images.lastricoPrima} after={images.lastricoDopo} title={d.projects[0].title} place={`${d.projects[0].place} (${d.projects[0].country})`} />
+        <div class="ba-grid__offset">
+          <BeforeAfter lang={lang} id="ba-home-2" before={images.condominioPrima} after={images.condominioDopo} title={d.projects[1].title} place={`${d.projects[1].place} (${d.projects[1].country})`} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== PROGETTI (orizzontale) ============================== -->
+  <section class="hs theme-dark" data-hscroll aria-labelledby="hs-title">
+    <div class="hs__track" data-hscroll-track>
+      <div class="hs__intro">
+        <p class="eyebrow">04 — {h.projectsEyebrow}</p>
+        <h2 class="h1" id="hs-title">{h.projectsTitle} <span class="serif gold">{h.projectsAccent}</span></h2>
+        <p class="hs__lead">{h.projectsLead}</p>
+        <a href={path(lang, 'projects')} class="link-line">{h.projectsAll} <Icon name="arrow" size={16} /></a>
+      </div>
+      {projectMedia.map((p, i) => (
+        <a href={path(lang, 'projects')} class="hs__card" data-cursor-text={d.ui.view}>
+          <div class="media hs__img">
+            <div data-hscroll-img class="hs__img-in">
+              <Img src={p.image} alt={`${d.projects[i].title} — ${d.projects[i].place}`} sizes="(min-width: 1024px) 34vw, 85vw" widths={[480, 768, 1080]} />
+            </div>
+            <span class:list={['hs__status mono', { 'is-live': p.status === 'in-corso' }]}>
+              {p.status === 'in-corso' ? d.ui.ongoing : d.ui.completed}
+            </span>
+          </div>
+          <div class="hs__meta">
+            <span class="mono gold" aria-hidden="true">{pad(i + 1)}</span>
+            <div>
+              <h3 class="h3">{d.projects[i].title}</h3>
+              <p class="mono hs__place">{d.projects[i].place} · {d.projects[i].country}</p>
+            </div>
+          </div>
+        </a>
+      ))}
+      <div class="hs__end">
+        <a href={path(lang, 'contact', 'preventivo')} class="hs__endlink" data-cursor-text={d.ui.start}>
+          <span class="h2">{h.projectsNext[0]}<br /><span class="serif gold">{h.projectsNext[1]}</span></span>
+          <span class="hs__endicon" aria-hidden="true"><Icon name="arrow-up-right" size={40} /></span>
+        </a>
+      </div>
+    </div>
+    <div class="hs__bar container" aria-hidden="true"><span data-hscroll-bar></span></div>
+  </section>
+
+  <!-- ============================== SOSTENIBILITÀ ============================== -->
+  <section class="section sus">
+    <div class="container sus__grid">
+      <div class="sus__media">
+        <div class="media sus__img" data-reveal="clip">
+          <div data-parallax="16" class="sus__px"><Img src={images.sicurezza} alt={h.susImgAlt} sizes="(min-width: 1024px) 45vw, 100vw" /></div>
+        </div>
+        <div class="media sus__img2" data-reveal="clip" data-delay="0.2">
+          <Img src={images.mezzi} alt={h.susImg2Alt} sizes="(min-width: 1024px) 20vw, 40vw" widths={[480, 720]} />
+        </div>
+      </div>
+      <div class="sus__text">
+        <p class="eyebrow" data-reveal="fade">{h.susEyebrow}</p>
+        <h2 class="h2" data-split>{h.susTitle} <span class="serif gold">{h.susAccent}</span></h2>
+        <p class="lead muted" data-reveal="up">{h.susLead}</p>
+        <div class="sus__practices" data-reveal="up">
+          <h3 class="h3">{h.practicesTitle}</h3>
+          <p class="muted">{h.practicesBody}</p>
+        </div>
+        <ul class="sus__icons" role="list" data-reveal="stagger">
+          <li><Icon name="leaf" size={28} /><span>{h.susIcons[0]}</span></li>
+          <li><Icon name="timer" size={28} /><span>{h.susIcons[1]}</span></li>
+          <li><Icon name="chip" size={28} /><span>{h.susIcons[2]}</span></li>
+        </ul>
+        <p class="sus__commit muted" data-reveal="up"><strong>{h.commitTitle}</strong> {h.commitBody}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== PRESENZA ============================== -->
+  <section class="section theme-bone presence">
+    <div class="container">
+      <SectionHead index="05" eyebrow={h.presenceEyebrow} title={h.presenceTitle} accent={h.presenceAccent} lead={h.presenceLead} />
+      <div class="offices">
+        {offices.map((o, i) => (
+          <article class="office" data-reveal="up">
+            <div class="office__top">
+              <span class="mono">{o.countryCode}</span>
+              <span class="mono muted">{o.coordsLabel}</span>
+            </div>
+            <h3 class="office__country">{d.offices[i].country}</h3>
+            <p class="office__addr">{d.offices[i].full}</p>
+            <div class="office__links">
+              <a href={o.phoneHref} class="link-line"><Icon name="phone" size={16} /> {o.phone}</a>
+              <a href={o.maps} class="link-line" target="_blank" rel="noopener"><Icon name="pin" size={16} /> {d.ui.openMaps}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <ul class="people" role="list">
+        {leadershipMedia.map((p, i) => (
+          <li class="person" data-reveal="up" data-delay={String(i * 0.08)}>
+            <div class="media person__img">
+              <Img src={p.image} alt={`${p.name}, ${d.leadership[i].role}`} sizes="(min-width: 860px) 28vw, 80vw" widths={[480, 768]} />
+            </div>
+            <p class="person__name">{p.name} <span class="muted">{d.leadership[i].title}</span></p>
+            <p class="mono gold-3">{d.leadership[i].role}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== TESTIMONIANZE ============================== -->
+  <section class="section theme-dark">
+    <div class="container">
+      <SectionHead index="06" eyebrow={h.testimonialsEyebrow} title={h.testimonialsTitle} accent={h.testimonialsAccent} lead={h.testimonialsLead} />
+      <Testimonials lang={lang} />
+    </div>
+  </section>
+
+  <!-- ============================== FAQ ============================== -->
+  <section class="section faq-sec">
+    <div class="container faq-sec__grid">
+      <div class="faq-sec__head">
+        <p class="eyebrow" data-reveal="fade">{h.faqEyebrow}</p>
+        <h2 class="h2" data-split>{h.faqTitle} <span class="serif gold">{h.faqAccent}</span></h2>
+        <p class="muted" data-reveal="up">{h.faqLead}</p>
+        <a href={wa} target="_blank" rel="noopener" class="btn" data-reveal="up" data-magnetic>
+          <Icon name="whatsapp" size={18} />
+          <span>{d.ui.whatsappAsk}</span>
+        </a>
+      </div>
+      <Faq lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------- HERO ---------------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    padding-top: calc(var(--header-h) + 2rem);
+  }
+  .hero__media { position: absolute; inset: 0; }
+  .hero__slide { position: absolute; inset: 0; overflow: hidden; }
+  .hero__slide:not(:first-child) { opacity: 0; }
+  .hero__slide :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .hero__shade {
+    position: absolute; inset: 0; z-index: 3;
+    background:
+      linear-gradient(to top, rgba(15,14,12,.96) 0%, rgba(15,14,12,.6) 38%, rgba(15,14,12,.25) 70%, rgba(15,14,12,.55) 100%),
+      linear-gradient(100deg, rgba(15,14,12,.65), transparent 65%);
+  }
+  .hero__grid { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+  .hero__grid span { position: absolute; background: var(--line-dark); }
+  .hero__grid .v { top: 0; bottom: 0; width: 1px; transform-origin: top; }
+  .hero__grid .h { left: 0; right: 0; height: 1px; transform-origin: left; }
+  .hero__coords {
+    position: absolute; z-index: 5; right: var(--gutter); top: 50%;
+    writing-mode: vertical-rl; display: flex; gap: 2rem; color: rgba(242,237,228,.5);
+    transform: translateY(-50%);
+  }
+  .hero__content { position: relative; z-index: 5; display: grid; gap: clamp(1.25rem, 2.5vw, 2rem); }
+  .hero__title { max-width: 11ch; }
+  .hero__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 2rem; }
+  .hero__fadein { animation: hero-in 1.2s var(--ease-out) both; }
+  @keyframes hero-in { from { transform: translateY(24px); } to { transform: none; } }
+  .hero__sub { max-width: 48ch; font-size: var(--fs-lg); color: rgba(242,237,228,.82); }
+  .hero__sub .serif { display: block; font-size: 1.5em; line-height: 1.1; margin-bottom: 0.5rem; }
+  .hero__ctas { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .hero__bottom {
+    display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
+    border-top: 1px solid var(--line-dark);
+    padding-block: 1.3rem 1.6rem;
+    margin-top: clamp(0.5rem, 2vw, 1.5rem);
+  }
+  .hero__slideinfo { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+  .hero__progress { width: 5rem; height: 1px; background: var(--line-dark); flex-shrink: 0; overflow: hidden; }
+  .hero__progress span { display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+  .hero__caption { color: rgba(242,237,228,.65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero__scroll { display: flex; align-items: center; gap: 0.8rem; color: rgba(242,237,228,.75); }
+  .hero__scroll-line { position: relative; width: 1px; height: 2.6rem; background: var(--line-dark); overflow: hidden; }
+  .hero__scroll-line::after {
+    content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 40%; background: var(--gold);
+    animation: scrollcue 2s var(--ease-in-out) infinite;
+  }
+  @keyframes scrollcue { from { transform: translateY(-100%); } to { transform: translateY(260%); } }
+  @media (max-width: 900px) {
+    .hero__row { grid-template-columns: 1fr; }
+    .hero__coords { display: none; }
+  }
+  @media (max-width: 560px) {
+    .hero__caption { display: none; }
+    .hero__ctas .btn { flex: 1 1 100%; justify-content: space-between; }
+  }
+
+  /* ---------------- ABOUT ---------------- */
+  .about__grid { display: grid; grid-template-columns: 5fr 6fr; gap: clamp(2rem, 6vw, 7rem); align-items: start; }
+  .about__media { position: sticky; top: calc(var(--header-h) + 2rem); }
+  .about__img { aspect-ratio: 4 / 5; }
+  .about__badge {
+    position: absolute; right: -1.5rem; bottom: 5rem;
+    background: var(--gold); color: var(--ink);
+    padding: 1.2rem 1.4rem; display: grid; gap: 0.4rem;
+  }
+  .about__badge .gold { color: var(--bone); }
+  .about__badge-n { font-size: 3.4rem; font-weight: 750; font-variation-settings: 'wdth' 115; line-height: 0.9; letter-spacing: -0.04em; }
+  .about__sign { display: flex; flex-direction: column; gap: 0.2rem; margin-top: 1.2rem; }
+  .about__sign .serif { font-size: 1.8rem; line-height: 1; }
+  .about__text { display: grid; gap: 1.8rem; padding-top: 1rem; }
+  .about__lead { font-size: var(--fs-lg); }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line-light); }
+  .pillar { display: grid; grid-template-columns: auto 1fr; gap: 1rem; padding: 1.5rem 1.5rem 1.5rem 0; border-bottom: 1px solid var(--line-light); }
+  .pillar:nth-child(odd) { border-right: 1px solid var(--line-light); }
+  .pillar:nth-child(even) { padding-left: 1.5rem; }
+  .pillar__n { color: var(--gold-3); padding-top: 0.2rem; }
+  .pillar__t { font-size: 1.1rem; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+  .pillar p { font-size: var(--fs-sm); }
+  .about__quote { border-left: 2px solid var(--gold); padding-left: 1.5rem; }
+  .about__quote p { font-size: clamp(1.3rem, 1rem + 1vw, 1.9rem); line-height: 1.3; }
+  .about__ctas { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+  @media (max-width: 1023px) {
+    .about__grid { grid-template-columns: 1fr; }
+    .about__media { position: relative; top: 0; max-width: 560px; }
+    .about__badge { right: 1rem; }
+  }
+  @media (max-width: 600px) {
+    .pillars { grid-template-columns: 1fr; }
+    .pillar:nth-child(odd) { border-right: 0; }
+    .pillar:nth-child(even) { padding-left: 0; }
+  }
+
+  /* ---------------- NUMBERS ---------------- */
+  .numbers__head { display: grid; grid-template-columns: 1fr 2fr; gap: var(--gutter); margin-bottom: clamp(2.5rem, 5vw, 4rem); align-items: start; }
+  .numbers__claim { max-width: 26ch; font-size: var(--fs-2xl); }
+  @media (max-width: 800px) { .numbers__head { grid-template-columns: 1fr; } }
+
+  /* ---------------- SERVICES LIST ---------------- */
+  .slist { position: relative; }
+  .slist ul { border-top: 1px solid var(--line-light); }
+  .slist__row {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1.3fr) minmax(0, 1fr) 3rem;
+    align-items: center;
+    gap: 1.5rem;
+    padding-block: clamp(1.4rem, 2.4vw, 2.2rem);
+    border-bottom: 1px solid var(--line-light);
+    position: relative;
+    transition: padding 0.6s var(--ease-out), color 0.4s;
+  }
+  .slist__row::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; background: var(--ink);
+    transform: scaleY(0); transform-origin: bottom; transition: transform 0.6s var(--ease-out);
+  }
+  .slist__thumb { display: none; }
+  .slist__n { color: var(--gold-3); }
+  .slist__t { font-size: clamp(1.4rem, 1rem + 1.6vw, 2.6rem); font-weight: 600; font-variation-settings: 'wdth' 106; letter-spacing: -0.03em; line-height: 1.05; }
+  .slist__d { font-size: var(--fs-sm); max-width: 36ch; color: var(--stone-2); }
+  .slist__arrow { justify-self: end; transition: transform 0.6s var(--ease-out); }
+  @media (hover: hover) {
+    .slist__row:hover { color: var(--bone); padding-inline: 1.5rem; }
+    .slist__row:hover::before { transform: scaleY(1); }
+    .slist__row:hover .slist__d { color: rgba(242,237,228,.7); }
+    .slist__row:hover .slist__n { color: var(--gold-2); }
+    .slist__row:hover .slist__arrow { transform: rotate(45deg); color: var(--gold); }
+  }
+  .slist__float {
+    position: absolute; top: 0; left: 0; z-index: 5;
+    width: clamp(220px, 22vw, 340px); aspect-ratio: 4 / 5;
+    margin: calc(clamp(220px, 22vw, 340px) * -0.625) 0 0 calc(clamp(220px, 22vw, 340px) * -0.5);
+    pointer-events: none; opacity: 0; transform: scale(0.6);
+    overflow: hidden;
+  }
+  .slist__float-img { position: absolute; inset: 0; opacity: 0; }
+  .slist__float-img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 860px) {
+    .slist__row { grid-template-columns: 4.5rem minmax(0, 1fr) 2rem; gap: 0.4rem 1rem; }
+    .slist__n { display: none; }
+    .slist__thumb { display: block; grid-row: span 2; width: 4.5rem; aspect-ratio: 1; }
+    .slist__t { grid-column: 2; }
+    .slist__d { grid-column: 2; }
+    .slist__arrow { grid-column: 3; grid-row: 1 / span 2; }
+    .slist__float { display: none; }
+  }
+
+  /* ---------------- GUARANTEES ---------------- */
+  .gcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 3vw, 2.5rem) var(--gutter); }
+  .gcard { display: grid; gap: 1.3rem; align-content: start; }
+  .gcard__img { aspect-ratio: 4 / 3; }
+  .gcard__img :global(img) { transition: transform 1.2s var(--ease-out), filter 0.8s; filter: saturate(0.85); }
+  .gcard:hover .gcard__img :global(img) { transform: scale(1.06); filter: saturate(1.05); }
+  .gcard__body { display: grid; gap: 0.6rem; }
+  .gcard__n { color: var(--gold-3); }
+  .gcard p { font-size: var(--fs-sm); }
+  @media (max-width: 1023px) { .gcards { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .gcards { grid-template-columns: 1fr; } }
+
+  /* ---------------- BEFORE / AFTER ---------------- */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); align-items: start; }
+  .ba-grid__offset { margin-top: clamp(0rem, 10vw, 9rem); }
+  @media (max-width: 800px) { .ba-grid { grid-template-columns: 1fr; } .ba-grid__offset { margin-top: 1.5rem; } }
+
+  /* ---------------- HORIZONTAL PROJECTS ---------------- */
+  .hs { position: relative; overflow: hidden; padding-block: clamp(4rem, 8vw, 6rem); border-top: 1px solid var(--line-dark); }
+  .hs__track { display: flex; gap: clamp(1.5rem, 3vw, 3rem); padding-inline: var(--gutter); width: max-content; align-items: stretch; }
+  .hs__intro { width: min(420px, 80vw); display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; flex-shrink: 0; padding-right: 2rem; }
+  .hs__card { width: clamp(300px, 34vw, 520px); flex-shrink: 0; display: grid; gap: 1.2rem; align-content: start; }
+  .hs__img { aspect-ratio: 4 / 5; }
+  .hs__img-in { position: absolute; inset: 0 -10%; }
+  .hs__img-in :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+  .hs__card:hover .hs__img-in :global(img) { transform: scale(1.05); }
+  .hs__status {
+    position: absolute; left: 1rem; top: 1rem; padding: 0.45rem 0.75rem;
+    background: rgba(15,14,12,.75); color: var(--bone); display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .hs__status.is-live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(192,138,53,.7); } 70% { box-shadow: 0 0 0 9px rgba(192,138,53,0); } 100% { box-shadow: 0 0 0 0 rgba(192,138,53,0); } }
+  .hs__meta { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.5rem; }
+  .hs__meta h3 { margin-bottom: 0.35rem; }
+  .hs__lead { color: rgba(242,237,228,.72); }
+  .hs__place { color: rgba(242,237,228,.68); }
+  .hs__end { width: min(460px, 80vw); flex-shrink: 0; display: flex; }
+  .hs__endlink {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2rem;
+    border: 1px solid var(--line-dark); transition: background 0.5s, color 0.5s;
+    aspect-ratio: 4 / 5; align-self: start;
+  }
+  .hs__endlink:hover { background: var(--gold); color: var(--ink); }
+  .hs__endlink:hover .gold { color: var(--ink); }
+  .hs__endicon { align-self: flex-end; }
+  .hs__bar { margin-top: 2.5rem; height: 1px; position: relative; }
+  .hs__bar::before { content: ''; position: absolute; inset: 0 var(--gutter); background: var(--line-dark); }
+  .hs__bar span { position: absolute; inset: 0 var(--gutter); background: var(--gold); transform: scaleX(0); transform-origin: left; }
+  @media (min-width: 1024px) {
+    .hs { height: 100vh; min-height: 640px; display: flex; flex-direction: column; justify-content: center; padding-block: calc(var(--header-h) * 0.5) 0; }
+    .hs__card { width: calc(min(58vh, 620px) * 0.8); }
+    .hs__img { height: min(58vh, 620px); aspect-ratio: auto; }
+    .hs__endlink { height: min(58vh, 620px); aspect-ratio: auto; }
+  }
+  @media (max-width: 1023px) {
+    .hs__track { overflow-x: auto; width: auto; scroll-snap-type: x mandatory; padding-bottom: 1rem; scrollbar-width: none; }
+    .hs__track::-webkit-scrollbar { display: none; }
+    .hs__card, .hs__end, .hs__intro { scroll-snap-align: start; }
+    .hs__card { width: 78vw; }
+    .hs__bar { display: none; }
+  }
+
+  /* ---------------- SUSTAINABILITY ---------------- */
+  .sus__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 7rem); align-items: center; }
+  .sus__media { position: relative; padding-bottom: 4rem; }
+  .sus__img { aspect-ratio: 3 / 4; }
+  .sus__px { position: absolute; inset: -8% 0; }
+  .sus__px :global(picture), .sus__px :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .sus__img2 { position: absolute; width: 42%; aspect-ratio: 3 / 4; right: -2rem; bottom: 0; border: 6px solid var(--paper); }
+  .sus__text { display: grid; gap: 1.6rem; }
+  .sus__practices { padding: 1.6rem 0; border-block: 1px solid var(--line-light); display: grid; gap: 0.6rem; }
+  .sus__icons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .sus__icons li { display: grid; gap: 0.8rem; padding: 1.2rem; background: var(--bone); font-weight: 600; font-size: var(--fs-sm); }
+  .sus__icons :global(svg) { color: var(--gold-3); }
+  .sus__commit { font-size: var(--fs-sm); }
+  .sus__commit strong { color: var(--ink); }
+  @media (max-width: 1023px) { .sus__grid { grid-template-columns: 1fr; } .sus__img2 { right: 0; } .sus__media { max-width: 620px; } }
+  @media (max-width: 480px) { .sus__icons { grid-template-columns: 1fr; } }
+
+  /* ---------------- PRESENCE ---------------- */
+  .offices { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); margin-bottom: clamp(3rem, 6vw, 5rem); }
+  .office {
+    background: var(--paper); padding: clamp(1.6rem, 3vw, 2.6rem); display: grid; gap: 1rem;
+    border: 1px solid var(--line-light); transition: border-color 0.5s, transform 0.6s var(--ease-out);
+  }
+  .office:hover { border-color: var(--gold); transform: translateY(-4px); }
+  .office__top { display: flex; justify-content: space-between; }
+  .office__country { font-size: clamp(2.6rem, 1.6rem + 4vw, 5.5rem); font-weight: 700; font-variation-settings: 'wdth' 115; text-transform: uppercase; letter-spacing: -0.045em; line-height: 0.9; }
+  .office__addr { font-size: var(--fs-lg); }
+  .office__links { display: flex; flex-wrap: wrap; gap: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line-light); font-size: var(--fs-sm); }
+  .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+  .person { display: grid; gap: 0.6rem; }
+  .person__img { aspect-ratio: 1; margin-bottom: 0.6rem; }
+  .person__img :global(img) { filter: grayscale(1) contrast(1.05); transition: filter 0.8s, transform 1.2s var(--ease-out); }
+  .person:hover .person__img :global(img) { filter: grayscale(0); transform: scale(1.04); }
+  .person__name { font-size: 1.25rem; font-weight: 600; }
+  .gold-3 { color: var(--gold-3); }
+  @media (max-width: 860px) { .offices { grid-template-columns: 1fr; } .people { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .people { grid-template-columns: 1fr; } }
+
+  /* ---------------- FAQ ---------------- */
+  .faq-sec__grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+  .faq-sec__head { display: grid; gap: 1.5rem; justify-items: start; position: sticky; top: calc(var(--header-h) + 2rem); }
+  @media (max-width: 1023px) { .faq-sec__grid { grid-template-columns: 1fr; } .faq-sec__head { position: static; } }
+</style>

@@ -1,21 +1,24 @@
 ---
-import { faqs } from '../data/site';
+import { t, pad, type Lang } from '../i18n';
 import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
 ---
 <div class="faq">
-  {faqs.map((f, i) => (
+  {d.faqs.map((f, i) => (
     <details class="faq__item" data-accordion data-reveal="up">
       <summary>
-        <span class="mono faq__n">{String(i + 1).padStart(2, '0')}</span>
-        <span class="faq__q">{f.q}</span>
+        <span class="mono faq__n" aria-hidden="true">{pad(i + 1)}</span>
+        <h3 class="faq__q">{f.q}</h3>
         <span class="faq__icon" aria-hidden="true"><Icon name="plus" size={20} /></span>
       </summary>
       <div class="faq__body" data-accordion-body>
         <div class="faq__inner prose">
           {f.a.map((p) => <p>{p}</p>)}
-          {f.list && (
+          {f.list.length > 0 && (
             <ol>
-              {f.list.map(([t, d]) => <li><strong>{t}.</strong> {d}</li>)}
+              {f.list.map(([ti, de]) => <li><strong>{ti}.</strong> {de}</li>)}
             </ol>
           )}
           {f.after && <p>{f.after}</p>}
@@ -44,7 +47,7 @@ import Icon from './Icon.astro';
   .faq__body { overflow: hidden; }
   .faq__inner { padding: 0 0 2rem 4rem; color: var(--stone-2); }
   .faq__inner ol { margin-top: 1rem; padding-left: 1.2rem; display: grid; gap: 0.55rem; }
-  .faq__inner p + ol + p { margin-top: 1rem; }
+  .faq__inner ol + p { margin-top: 1rem; }
   .faq__inner strong { color: var(--ink); font-weight: 600; }
-  @media (max-width: 600px) { summary { grid-template-columns: 2rem 1fr auto; } .faq__inner { padding-left: 0; } }
+  @media (max-width: 600px) { summary { grid-template-columns: 2rem 1fr auto; } .faq__inner { padding-left: 0; } .faq__icon { width: 2.6rem; height: 2.6rem; } }
 </style>

@@ -1,21 +1,31 @@
 ---
 import Base from './Base.astro';
-interface Props { title: string; description: string; heading: string; updated: string; path: string }
-const { title, description, heading, updated, path } = Astro.props;
+import { t, path, type Lang } from '../i18n';
+import { privacyHtml } from '../i18n/legal/privacy';
+import { cookiesHtml } from '../i18n/legal/cookies';
+import termsIt from '../i18n/legal/terms-it.html?raw';
+import termsEn from '../i18n/legal/terms-en.html?raw';
+import termsBg from '../i18n/legal/terms-bg.html?raw';
+
+interface Props { lang: Lang; doc: 'privacy' | 'cookies' | 'terms' }
+const { lang, doc } = Astro.props;
+const d = t(lang);
+const page = d.pages[doc];
+const terms = { it: termsIt, en: termsEn, bg: termsBg };
+const html = doc === 'privacy' ? privacyHtml[lang] : doc === 'cookies' ? cookiesHtml[lang] : terms[lang];
+const updated = doc === 'terms' ? '20/09/2024' : '09/11/2026';
 ---
-<Base title={title} description={description} breadcrumbs={[{ name: heading, href: path }]}>
+<Base lang={lang} route={doc} title={page.metaTitle} description={page.metaDescription} breadcrumbs={[{ name: page.heading, href: path(lang, doc) }]}>
   <section class="legal-hero theme-dark">
     <div class="container">
-      <nav aria-label="Percorso" class="mono legal-crumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <span aria-current="page">{heading}</span></nav>
-      <h1 class="h1" data-split data-split-hero>{heading}</h1>
-      <p class="mono legal-upd">Ultimo aggiornamento: {updated}</p>
+      <nav aria-label={d.ui.breadcrumb} class="mono legal-crumb"><a href={path(lang, 'home')}>{d.ui.home}</a> <span aria-hidden="true">/</span> <span aria-current="page">{page.heading}</span></nav>
+      <h1 class="h1" data-hero-title>{page.heading}</h1>
+      <p class="mono legal-upd">{d.ui.updated}: {updated}</p>
     </div>
   </section>
   <section class="section legal">
     <div class="container legal__wrap">
-      <article class="legal__body">
-        <slot />
-      </article>
+      <article class="legal__body" set:html={html} />
     </div>
   </section>
 </Base>
@@ -37,6 +47,6 @@ const { title, description, heading, updated, path } = Astro.props;
   .legal__body :global(strong) { color: var(--ink); font-weight: 600; }
   .legal__body :global(table) { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: var(--fs-sm); }
   .legal__body :global(th), .legal__body :global(td) { text-align: left; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--line-light); vertical-align: top; }
-  .legal__body :global(th) { font-family: var(--f-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--stone); font-weight: 500; }
+  .legal__body :global(th) { font-family: var(--f-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--stone-2); font-weight: 500; }
   .legal__body :global(.legal-box) { padding: 1.4rem 1.6rem; background: var(--bone); border-left: 2px solid var(--gold); margin-bottom: 2rem; }
 </style>

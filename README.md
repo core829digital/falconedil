@@ -22,20 +22,34 @@ npm run preview   # anteprima della build
 
 Richiede Node.js ≥ 22.23.
 
+## Lingue
+
+Il sito è in **italiano** (`/`), **inglese** (`/en/`) e **bulgaro** (`/bg/`), con URL tradotti
+(es. `/chi-siamo/` · `/en/about-us/` · `/bg/za-nas/`), selettore lingua, `hreflang` e sitemap multilingua.
+I vecchi URL WordPress EN/BG (es. `/about-us/`, `/услуги/`) reindirizzano automaticamente alle nuove pagine.
+
 ## Struttura
 
 ```
 src/
-  data/site.ts        → TUTTI i contenuti (testi, contatti, servizi, progetti, team, FAQ)
-  assets/             → immagini originali del cliente (ottimizzate in build)
+  i18n/dict/it.ts     → TUTTI i testi in italiano (lingua di riferimento)
+  i18n/dict/en.ts     → testi in inglese (stessa struttura, verificata da TypeScript)
+  i18n/dict/bg.ts     → testi in bulgaro
+  i18n/legal/         → privacy, cookie e termini nelle 3 lingue
+  i18n/config.ts      → lingue, URL tradotti, redirect dei vecchi URL
+  data/site.ts        → dati neutri: immagini, telefoni, indirizzi, numeri
+  views/              → le pagine (una vista per pagina, condivisa dalle 3 lingue)
+  pages/              → rotte (file sottili che richiamano le viste)
   components/         → componenti riutilizzabili
-  layouts/            → layout base (SEO, JSON-LD) e pagine legali
-  pages/              → pagine (stessi URL del vecchio sito)
+  layouts/            → layout base (SEO, hreflang, JSON-LD) e pagine legali
   scripts/main.ts     → motore delle animazioni (attributi data-*)
   styles/global.css   → design system (colori, tipografia, bottoni)
 ```
 
-Per modificare un testo o un numero basta intervenire su `src/data/site.ts`.
+- Per cambiare un **testo**: `src/i18n/dict/<lingua>.ts`.
+- Per cambiare un **telefono, indirizzo, numero o immagine**: `src/data/site.ts`.
+
+`npm run check` verifica che le tre lingue abbiano esattamente gli stessi campi.
 
 ## Modulo contatti
 
@@ -57,7 +71,18 @@ PUBLIC_FORM_ACCESS_KEY=<chiave>
 - Dati strutturati: `GeneralContractor` (2 sedi), `Organization`, `FAQPage`, `Service`, `BreadcrumbList`
 - `sitemap-index.xml` e `robots.txt` generati automaticamente
 
+## Qualità (Lighthouse, mobile)
+
+| | Performance | Accessibilità | Best practices | SEO |
+|---|---|---|---|---|
+| Home (IT/EN/BG) | 85–87 (desktop 98) | 100 | 100 | 100 |
+| Pagine interne | 90–97 | 100 | 100 | 100 |
+
+LCP reale misurato ≈ 1,1 s su mobile con rete e CPU rallentate.
+
 ## Deploy
 
 Qualsiasi hosting statico (Netlify, Vercel, Cloudflare Pages):
 build command `npm run build`, cartella di output `dist`.
+
+Header di sicurezza e cache già configurati: `public/_headers` (Netlify / Cloudflare Pages) e `vercel.json` (Vercel).

@@ -1,26 +1,32 @@
 ---
 import { Image } from 'astro:assets';
-import { nav, company, offices, images } from '../data/site';
+import { company, offices, images } from '../data/site';
+import { t, path, alternates, localeMeta, pad, type Lang, type RouteKey } from '../i18n';
 import Icon from './Icon.astro';
 
-const path = Astro.url.pathname;
-const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+interface Props { lang: Lang; route: RouteKey | null }
+const { lang, route } = Astro.props;
+const d = t(lang);
+const navKeys = ['home', 'about', 'services', 'projects', 'contact'] as const;
+const nav = navKeys.map((k) => ({ key: k, label: d.nav[k], href: path(lang, k) }));
+const office = lang === 'bg' ? offices[1] : offices[0];
+const langs = alternates(route ?? 'home');
 ---
 <header class="hdr" data-header>
   <div class="hdr__bar container">
-    <a href="/" class="brand" aria-label="Falcon Edil — Home">
+    <a href={path(lang, 'home')} class="brand">
       <Image src={images.emblem} alt="" width={52} height={60} class="brand__emblem" loading="eager" />
       <span class="brand__word">
-        <span class="brand__name">Falcon<span>Edil</span></span>
-        <span class="brand__sub">Costruzioni edili</span>
+        <span class="brand__name">Falcon <span>Edil</span></span>
+        <span class="brand__sub">{d.company.tagline}</span>
       </span>
     </a>
 
-    <nav class="hdr__nav" aria-label="Navigazione principale">
+    <nav class="hdr__nav" aria-label={d.ui.mainNav}>
       <ul role="list">
         {nav.slice(1).map((item) => (
           <li>
-            <a href={item.href} class="roll" aria-current={isActive(item.href) ? 'page' : undefined}>
+            <a href={item.href} class="roll" aria-current={route === item.key ? 'page' : undefined}>
               <span class="roll__in" data-text={item.label}>{item.label}</span>
             </a>
           </li>
@@ -29,15 +35,26 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     </nav>
 
     <div class="hdr__actions">
-      <a href={offices[0].phoneHref} class="hdr__phone mono" aria-label={`Chiama ${offices[0].phone}`}>
+      <nav class="langs" aria-label={d.ui.language}>
+        {langs.map((l) => (
+          <a
+            href={l.href}
+            hreflang={localeMeta[l.lang].htmlLang}
+            lang={localeMeta[l.lang].htmlLang}
+            aria-current={l.lang === lang ? 'true' : undefined}
+            title={localeMeta[l.lang].label}
+          >{localeMeta[l.lang].short}</a>
+        ))}
+      </nav>
+      <a href={office.phoneHref} class="hdr__phone mono" aria-label={`${d.ui.callNumber} ${office.phone}`}>
         <Icon name="phone" size={16} />
-        <span>{offices[0].phone}</span>
+        <span>{office.phone}</span>
       </a>
-      <a href="/contatti/#preventivo" class="btn btn--gold hdr__cta" data-magnetic>
-        <span>Preventivo</span>
+      <a href={path(lang, 'contact', 'preventivo')} class="btn btn--gold hdr__cta" data-magnetic>
+        <span>{d.ui.quote}</span>
       </a>
-      <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
-        <span class="sr-only">Apri il menu</span>
+      <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle data-label-open={d.ui.openMenu} data-label-close={d.ui.closeMenu}>
+        <span class="sr-only">{d.ui.openMenu}</span>
         <span class="burger" aria-hidden="true"><i></i><i></i></span>
       </button>
     </div>
@@ -46,12 +63,12 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 <div class="menu theme-dark" id="menu" data-menu hidden>
   <div class="menu__inner container">
-    <nav aria-label="Menu mobile">
+    <nav aria-label={d.ui.mobileNav}>
       <ol class="menu__list" role="list">
         {nav.map((item, i) => (
           <li>
-            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-              <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+            <a href={item.href} aria-current={route === item.key ? 'page' : undefined}>
+              <span class="mono">{pad(i + 1)}</span>
               <span class="menu__label">{item.label}</span>
             </a>
           </li>
@@ -59,15 +76,24 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
       </ol>
     </nav>
     <div class="menu__foot">
-      {offices.map((o) => (
+      <nav class="menu__langs" aria-label={d.ui.language}>
+        {langs.map((l) => (
+          <a href={l.href} hreflang={localeMeta[l.lang].htmlLang} lang={localeMeta[l.lang].htmlLang} aria-current={l.lang === lang ? 'true' : undefined}>
+            {localeMeta[l.lang].label}
+          </a>
+        ))}
+      </nav>
+      <div class="menu__contacts">
+        {offices.map((o, i) => (
+          <div>
+            <p class="mono gold">{d.offices[i].country}</p>
+            <a href={o.phoneHref}>{o.phone}</a>
+          </div>
+        ))}
         <div>
-          <p class="mono gold">{o.country}</p>
-          <a href={o.phoneHref}>{o.phone}</a>
+          <p class="mono gold">{d.ui.email}</p>
+          <a href={`mailto:${company.email}`}>{company.email}</a>
         </div>
-      ))}
-      <div>
-        <p class="mono gold">Email</p>
-        <a href={`mailto:${company.email}`}>{company.email}</a>
       </div>
     </div>
   </div>
@@ -89,7 +115,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     transition: opacity 0.4s;
   }
   .hdr.is-solid {
-    background: rgba(248, 245, 239, 0.88);
+    background: rgba(248, 245, 239, 0.9);
     -webkit-backdrop-filter: saturate(1.4) blur(14px);
     backdrop-filter: saturate(1.4) blur(14px);
     color: var(--ink);
@@ -97,7 +123,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   }
   .hdr.is-solid::before { opacity: 0; }
   .hdr.is-hidden { transform: translateY(-100%); }
-  .hdr.menu-open { color: var(--bone); background: transparent; box-shadow: none; transform: none; }
+  .hdr.menu-open { color: var(--bone); background: transparent; box-shadow: none; transform: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .hdr.menu-open::before { opacity: 0; }
 
   .hdr__bar {
@@ -109,7 +135,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     gap: 1.5rem;
   }
 
-  .brand { display: inline-flex; align-items: center; gap: 0.75rem; }
+  .brand { display: inline-flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
   .brand__emblem { width: 40px; height: auto; filter: drop-shadow(0 2px 6px rgba(0,0,0,.25)); }
   .brand__word { display: flex; flex-direction: column; line-height: 1; }
   .brand__name {
@@ -118,18 +144,22 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     text-transform: uppercase;
     letter-spacing: 0.02em;
     font-size: 1.15rem;
+    white-space: nowrap;
   }
-  .brand__name span { color: var(--gold); margin-left: 0.28em; }
+  .brand__name span { color: var(--gold); transition: color 0.4s; }
+  .hdr.is-solid .brand__name span { color: var(--gold-deep); }
+  .hdr.is-solid .langs a[aria-current='true'], .hdr.is-solid .langs a:hover { color: var(--gold-3); }
   .brand__sub {
     font-family: var(--f-mono);
     font-size: 0.62rem;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    opacity: 0.7;
+    opacity: 0.75;
     margin-top: 0.35rem;
+    white-space: nowrap;
   }
 
-  .hdr__nav ul { display: flex; gap: clamp(1.2rem, 2.4vw, 2.6rem); }
+  .hdr__nav ul { display: flex; gap: clamp(1.1rem, 2.2vw, 2.4rem); }
   .roll {
     display: inline-block;
     overflow: hidden;
@@ -138,6 +168,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     letter-spacing: 0.02em;
     position: relative;
     padding-block: 0.4rem;
+    white-space: nowrap;
   }
   .roll__in { display: inline-block; position: relative; transition: transform 0.6s var(--ease-out); }
   .roll__in::after {
@@ -152,8 +183,13 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--gold);
   }
 
-  .hdr__actions { display: flex; align-items: center; gap: 1.25rem; }
-  .hdr__phone { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.85; transition: opacity 0.3s; }
+  .hdr__actions { display: flex; align-items: center; gap: 1.1rem; }
+  .langs { display: flex; align-items: center; font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.08em; }
+  .langs a { padding: 0.45rem 0.4rem; opacity: 0.6; transition: opacity 0.3s, color 0.3s; position: relative; }
+  .langs a + a::before { content: ''; position: absolute; left: -1px; top: 50%; width: 1px; height: 0.8em; transform: translateY(-50%); background: currentColor; opacity: 0.35; }
+  .langs a:hover { opacity: 1; color: var(--gold); }
+  .langs a[aria-current='true'] { opacity: 1; color: var(--gold); }
+  .hdr__phone { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.85; transition: opacity 0.3s, color 0.3s; white-space: nowrap; }
   .hdr__phone:hover { opacity: 1; color: var(--gold); }
   .hdr__cta { min-height: 2.9rem; padding-inline: 1.3rem; }
 
@@ -165,11 +201,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   [aria-expanded='true'] .burger i:first-child { top: 3.25px; transform: rotate(45deg); }
   [aria-expanded='true'] .burger i:last-child { top: 3.25px; transform: rotate(-45deg); }
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1240px) {
     .hdr__phone span { display: none; }
   }
-  @media (max-width: 960px) {
-    .hdr__nav, .hdr__phone { display: none; }
+  @media (max-width: 1060px) {
+    .hdr__nav, .hdr__phone, .langs { display: none; }
     .hdr__burger { display: grid; }
   }
   @media (max-width: 480px) {
@@ -186,14 +222,15 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     display: flex;
     clip-path: inset(0 0 100% 0);
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .menu[hidden] { display: none; }
-  .menu__inner { display: flex; flex-direction: column; justify-content: space-between; gap: 3rem; min-height: 100%; }
+  .menu__inner { display: flex; flex-direction: column; justify-content: space-between; gap: 2.5rem; min-height: 100%; }
   .menu__list li { border-bottom: 1px solid var(--line-dark); overflow: hidden; }
-  .menu__list a { display: flex; align-items: baseline; gap: 1.25rem; padding-block: 1rem; }
+  .menu__list a { display: flex; align-items: baseline; gap: 1.25rem; padding-block: 0.9rem; }
   .menu__list .mono { color: var(--gold-2); }
   .menu__label {
-    font-size: clamp(2.2rem, 9vw, 4.2rem);
+    font-size: clamp(2rem, 8.5vw, 4.2rem);
     font-weight: 650;
     font-variation-settings: 'wdth' 110;
     text-transform: uppercase;
@@ -201,6 +238,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     line-height: 1;
   }
   .menu__list a[aria-current='page'] .menu__label { color: var(--gold); }
-  .menu__foot { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
-  .menu__foot p { margin-bottom: 0.35rem; }
+  .menu__foot { display: grid; gap: 1.8rem; }
+  .menu__langs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .menu__langs a { padding: 0.6rem 1rem; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line-dark); font-size: var(--fs-sm); font-weight: 600; }
+  .menu__langs a[aria-current='true'] { background: var(--gold); color: var(--ink); box-shadow: none; }
+  .menu__contacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.4rem; }
+  .menu__contacts p { margin-bottom: 0.35rem; }
 </style>
