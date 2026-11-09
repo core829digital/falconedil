@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="Pagina non trovata" description="La pagina che cerchi non esiste o è stata spostata." noindex>
+  <section class="nf theme-dark">
+    <div class="container nf__in">
+      <p class="eyebrow">Errore 404</p>
+      <h1 class="display" data-split data-split-hero>Cantiere<br /><span class="serif gold">chiuso.</span></h1>
+      <p class="lead muted">La pagina che cerchi non esiste o è stata spostata. Torna alla home o scopri i nostri progetti.</p>
+      <div class="nf__ctas">
+        <a href="/" class="btn btn--gold"><span>Torna alla home</span><span class="btn__icon"><Icon name="arrow" size={18} /></span></a>
+        <a href="/progetti/" class="btn btn--ghost"><span>Progetti</span></a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .nf { min-height: 100svh; display: flex; align-items: center; padding-top: var(--header-h); }
+  .nf__in { display: grid; gap: 1.6rem; }
+  .nf__ctas { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+</style>

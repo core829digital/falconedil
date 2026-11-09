@@ -1,0 +1,42 @@
+---
+import Base from './Base.astro';
+interface Props { title: string; description: string; heading: string; updated: string; path: string }
+const { title, description, heading, updated, path } = Astro.props;
+---
+<Base title={title} description={description} breadcrumbs={[{ name: heading, href: path }]}>
+  <section class="legal-hero theme-dark">
+    <div class="container">
+      <nav aria-label="Percorso" class="mono legal-crumb"><a href="/">Home</a> <span aria-hidden="true">/</span> <span aria-current="page">{heading}</span></nav>
+      <h1 class="h1" data-split data-split-hero>{heading}</h1>
+      <p class="mono legal-upd">Ultimo aggiornamento: {updated}</p>
+    </div>
+  </section>
+  <section class="section legal">
+    <div class="container legal__wrap">
+      <article class="legal__body">
+        <slot />
+      </article>
+    </div>
+  </section>
+</Base>
+<style>
+  .legal-hero { padding: calc(var(--header-h) + clamp(3rem, 8vw, 7rem)) 0 clamp(3rem, 6vw, 5rem); }
+  .legal-hero .container { display: grid; gap: 1.4rem; }
+  .legal-crumb { display: flex; gap: 0.6rem; color: rgba(242,237,228,.6); }
+  .legal-crumb a:hover { color: var(--gold-2); }
+  .legal-upd { color: var(--gold-2); }
+  .legal__wrap { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .legal__body { max-width: 78ch; }
+  .legal__body :global(h2) { font-size: var(--fs-xl); margin: 2.6rem 0 0.9rem; letter-spacing: -0.015em; }
+  .legal__body :global(h2:first-child) { margin-top: 0; }
+  .legal__body :global(h3) { font-size: 1.1rem; margin: 1.6rem 0 0.6rem; }
+  .legal__body :global(p), .legal__body :global(li) { color: var(--stone-2); }
+  .legal__body :global(p + p) { margin-top: 0.9rem; }
+  .legal__body :global(ul), .legal__body :global(ol) { margin: 0.8rem 0; padding-left: 1.3rem; display: grid; gap: 0.45rem; }
+  .legal__body :global(a) { color: var(--gold-3); text-decoration: underline; text-underline-offset: 3px; }
+  .legal__body :global(strong) { color: var(--ink); font-weight: 600; }
+  .legal__body :global(table) { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: var(--fs-sm); }
+  .legal__body :global(th), .legal__body :global(td) { text-align: left; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--line-light); vertical-align: top; }
+  .legal__body :global(th) { font-family: var(--f-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--stone); font-weight: 500; }
+  .legal__body :global(.legal-box) { padding: 1.4rem 1.6rem; background: var(--bone); border-left: 2px solid var(--gold); margin-bottom: 2rem; }
+</style>

@@ -1,0 +1,160 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Marquee from '../components/Marquee.astro';
+import { images, services, suppliers, process } from '../data/site';
+
+const site = Astro.site!;
+const serviceSchema = services.map((s) => ({
+  '@type': 'Service',
+  name: s.title,
+  description: s.body,
+  serviceType: s.title,
+  url: new URL(`/servizi/#${s.slug}`, site).href,
+  provider: { '@id': `${site.href}#organizzazione` },
+  areaServed: ['IT', 'BG', 'FR'],
+}));
+const extra = [
+  { title: 'Tinteggiatura di appartamenti', body: 'Finiture interne ed esterne curate nei dettagli, con materiali di qualità e cantieri puliti e ordinati.' },
+  { title: 'Impianti elettrici ed idraulici', body: 'Reparti dedicati alle infrastrutture elettriche e agli impianti idrici e di riscaldamento, coordinati con il cantiere.' },
+  { title: 'Manutenzioni e ampliamenti', body: 'Interventi di manutenzione ordinaria e straordinaria e ampliamenti di edifici residenziali, commerciali e industriali.' },
+];
+---
+<Base
+  title="Servizi — Costruzioni, ristrutturazioni, lastrici solari e consulenza"
+  description="Appartamenti di nuova costruzione, riparazioni e restauro, ripristino di pavimenti e lastrici solari, consulenza, architettura e servizio gru. Falcon Edil, Trinitapoli (BT) e Sofia."
+  image={images.cantierePlovdiv}
+  breadcrumbs={[{ name: 'Servizi', href: '/servizi/' }]}
+  schema={serviceSchema}
+>
+  <PageHero
+    crumb="Servizi"
+    eyebrow="Falcon Edil propone…"
+    title="Un’ampia gamma"
+    accent="di servizi."
+    lead="Progettazione e costruzione di edifici residenziali, commerciali e industriali, ristrutturazioni, manutenzioni e ampliamenti, con materiali di alta qualità, tecniche avanzate e consegne puntuali."
+    image={images.betoniera}
+    imageAlt="Autobetoniera e pompa per calcestruzzo in un cantiere Falcon Edil"
+  >
+    <nav class="toc" aria-label="Indice dei servizi" data-reveal="up" data-hero data-delay="0.7">
+      {services.map((s, i) => (
+        <a href={`#${s.slug}`}><span class="mono">{String(i + 1).padStart(2, '0')}</span> {s.title}</a>
+      ))}
+    </nav>
+  </PageHero>
+
+  <section class="section">
+    <div class="container">
+      <SectionHead index="01" eyebrow="I nostri…" title="Sono servizi" accent="di qualità." lead="La sicurezza sul lavoro e la sostenibilità ambientale sono aspetti fondamentali della gestione di ogni progetto, nel rispetto delle normative vigenti." />
+
+      <div class="svc">
+        {services.map((s, i) => (
+          <article class:list={['svc__item', { 'svc__item--rev': i % 2 === 1 }]} id={s.slug}>
+            <div class="svc__media">
+              <div class="media svc__img" data-reveal="clip">
+                <div data-parallax="14" class="svc__px"><Img src={s.image} alt={s.title} sizes="(min-width: 1024px) 50vw, 100vw" /></div>
+              </div>
+            </div>
+            <div class="svc__text">
+              <span class="svc__bignum" aria-hidden="true" data-reveal="fade">{String(i + 1).padStart(2, '0')}</span>
+              <span class="mono svc__n">Servizio {String(i + 1).padStart(2, '0')} / {String(services.length).padStart(2, '0')}</span>
+              <h2 class="h2" data-split>{s.title}</h2>
+              <p class="lead" data-reveal="up">{s.short}</p>
+              <p class="muted" data-reveal="up">{s.body}</p>
+              <ul class="svc__points" role="list" data-reveal="stagger">
+                {s.points.map((p) => <li><Icon name="check" size={16} /> {p}</li>)}
+              </ul>
+              <a href="/contatti/#preventivo" class="link-line" data-reveal="up">Richiedi un preventivo <Icon name="arrow" size={16} /></a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section theme-dark">
+    <div class="container">
+      <SectionHead index="02" eyebrow="Inoltre" title="Tutto ciò che serve," accent="sotto un unico tetto." />
+      <ul class="extra" role="list" data-reveal="stagger">
+        {extra.map((e, i) => (
+          <li>
+            <span class="mono gold">{String(services.length + i + 1).padStart(2, '0')}</span>
+            <h3 class="h3">{e.title}</h3>
+            <p class="muted">{e.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-bone">
+    <div class="container">
+      <SectionHead index="03" eyebrow="Come lavoriamo" title="Un processo chiaro," accent="dall’inizio alla fine." />
+      <ol class="steps" role="list" data-reveal="stagger">
+        {process.map((p, i) => (
+          <li>
+            <span class="steps__n">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="h3">{p.title}</h3>
+            <p class="muted">{p.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight suppliers">
+    <div class="container">
+      <p class="eyebrow" data-reveal="fade">Fiducia e valore — I nostri fornitori</p>
+    </div>
+    <Marquee items={suppliers} speed={40} tone="light" />
+  </section>
+</Base>
+
+<style>
+  .toc { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; }
+  .toc a {
+    display: inline-flex; gap: 0.6rem; align-items: center; padding: 0.55rem 0.95rem; font-size: var(--fs-sm);
+    border: 1px solid var(--line-dark); border-radius: 999px; transition: background 0.3s, color 0.3s, border-color 0.3s;
+  }
+  .toc a .mono { color: var(--gold-2); }
+  .toc a:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .toc a:hover .mono { color: var(--ink); }
+
+  .svc { display: grid; gap: clamp(5rem, 10vw, 9rem); }
+  .svc__item { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; scroll-margin-top: calc(var(--header-h) + 2rem); }
+  .svc__item--rev .svc__media { order: 2; }
+  .svc__media { position: relative; }
+  .svc__img { aspect-ratio: 4 / 5; }
+  .svc__px { position: absolute; inset: -8% 0; }
+  .svc__px :global(picture), .svc__px :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .svc__bignum {
+    font-size: clamp(4rem, 8vw, 7.5rem); font-weight: 800; font-variation-settings: 'wdth' 125; line-height: 0.8; letter-spacing: -0.06em;
+    color: transparent; -webkit-text-stroke: 1.2px var(--gold); pointer-events: none; margin-bottom: 0.4rem;
+  }
+  .svc__text { display: grid; gap: 1.3rem; justify-items: start; }
+  .svc__n { color: var(--gold-3); }
+  .svc__points { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .svc__points li { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.85rem; background: var(--bone); font-size: var(--fs-sm); font-weight: 550; }
+  .svc__points :global(svg) { color: var(--gold-3); }
+  @media (max-width: 1023px) {
+    .svc__item { grid-template-columns: 1fr; }
+    .svc__item--rev .svc__media { order: 0; }
+    .svc__media { max-width: 620px; }
+  }
+
+  .extra { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+  .extra li { display: grid; gap: 0.9rem; padding-top: 1.5rem; border-top: 1px solid var(--line-dark); align-content: start; }
+  @media (max-width: 860px) { .extra { grid-template-columns: 1fr; } }
+
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gutter); counter-reset: s; }
+  .steps li { display: grid; gap: 0.9rem; align-content: start; padding: 1.8rem; background: var(--paper); border-top: 2px solid var(--gold); }
+  .steps__n { font-size: 3.2rem; font-weight: 750; font-variation-settings: 'wdth' 120; letter-spacing: -0.05em; line-height: 1; color: var(--gold); }
+  .steps p { font-size: var(--fs-sm); }
+  @media (max-width: 1023px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
+
+  .suppliers .eyebrow { margin-bottom: 2rem; }
+</style>

@@ -1,0 +1,276 @@
+/* ==========================================================================
+   FALCON EDIL — Design System
+   Identità: precisione da cantiere, calore della pietra pugliese, oro del marchio.
+   ========================================================================== */
+
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+:root {
+  /* Colori */
+  --ink: #0f0e0c;
+  --ink-2: #171512;
+  --ink-3: #221f1b;
+  --bone: #f2ede4;
+  --paper: #f8f5ef;
+  --sand: #e6dccb;
+  --stone: #8b8378;
+  --stone-2: #5f5850;
+  --gold: #c08a35;
+  --gold-2: #dcae5f;
+  --gold-3: #8a5f22;
+  --line-dark: rgba(242, 237, 228, 0.14);
+  --line-light: rgba(15, 14, 12, 0.14);
+  --danger: #b4442e;
+  --ok: #4f7a43;
+
+  /* Tipografia */
+  --f-sans: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-serif: 'Instrument Serif', 'Times New Roman', serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: clamp(1.125rem, 1rem + 0.4vw, 1.3rem);
+  --fs-xl: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+  --fs-2xl: clamp(2rem, 1.3rem + 2.6vw, 3.6rem);
+  --fs-3xl: clamp(2.6rem, 1.4rem + 4.6vw, 6rem);
+  --fs-4xl: clamp(3.2rem, 1rem + 8.6vw, 10.5rem);
+
+  /* Spaziature & layout */
+  --gutter: clamp(1rem, 0.5rem + 2.4vw, 3rem);
+  --section: clamp(5rem, 3rem + 8vw, 11rem);
+  --max: 1440px;
+  --radius: 2px;
+  --header-h: 76px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  color-scheme: light;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Reset                                                                       */
+/* -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-sans);
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  font-variation-settings: 'wdth' 100;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+img, svg, video { display: block; max-width: 100%; }
+/* <picture> trasparente al layout: l'<img> eredita direttamente le dimensioni del contenitore */
+picture { display: contents; }
+img { height: auto; }
+input, button, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+h1, h2, h3, h4 { font-weight: 600; line-height: 1.02; letter-spacing: -0.02em; text-wrap: balance; }
+p { text-wrap: pretty; }
+ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
+::selection { background: var(--gold); color: var(--ink); }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: fixed; top: 0.75rem; left: 0.75rem; z-index: 1000;
+  background: var(--gold); color: var(--ink); padding: 0.7rem 1.1rem;
+  font-weight: 600; transform: translateY(-200%); transition: transform 0.3s var(--ease-out);
+}
+.skip-link:focus { transform: none; }
+
+/* Cross-document page transitions (browser supportati) */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: 0.45s var(--ease-in-out) both vt-out; }
+::view-transition-new(root) { animation: 0.6s var(--ease-out) both vt-in; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-1.5rem); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(2rem); } }
+
+/* -------------------------------------------------------------------------- */
+/* Layout                                                                      */
+/* -------------------------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section { padding-block: var(--section); position: relative; }
+.section--tight { padding-block: calc(var(--section) * 0.6); }
+.theme-dark { background: var(--ink); color: var(--bone); }
+.theme-dark .muted { color: rgba(242, 237, 228, 0.62); }
+.theme-bone { background: var(--bone); }
+.muted { color: var(--stone-2); }
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tipografia                                                                  */
+/* -------------------------------------------------------------------------- */
+.display {
+  font-size: var(--fs-4xl);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 112;
+  letter-spacing: -0.045em;
+  line-height: 0.88;
+  text-transform: uppercase;
+}
+.h1 { font-size: var(--fs-3xl); font-weight: 650; font-variation-settings: 'wdth' 106; letter-spacing: -0.035em; line-height: 0.95; }
+.h2 { font-size: var(--fs-2xl); font-weight: 600; font-variation-settings: 'wdth' 104; letter-spacing: -0.03em; line-height: 1; }
+.h3 { font-size: var(--fs-xl); font-weight: 600; letter-spacing: -0.015em; line-height: 1.1; }
+.serif { font-family: var(--f-serif); font-weight: 400; font-style: italic; letter-spacing: -0.01em; text-transform: none; font-variation-settings: normal; }
+.gold { color: var(--gold); }
+.lead { font-size: var(--fs-lg); line-height: 1.55; max-width: 60ch; }
+.prose p + p { margin-top: 1.1em; }
+.prose { max-width: 68ch; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--gold-3);
+}
+.theme-dark .eyebrow { color: var(--gold-2); }
+.eyebrow::before {
+  content: '';
+  width: 2.25rem;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+}
+.mono { font-family: var(--f-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* -------------------------------------------------------------------------- */
+/* Bottoni                                                                     */
+/* -------------------------------------------------------------------------- */
+.btn {
+  --bg: var(--ink);
+  --fg: var(--bone);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 3.5rem;
+  padding: 0 1.6rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  overflow: hidden;
+  isolation: isolate;
+  white-space: nowrap;
+  transition: color 0.5s var(--ease-out);
+}
+.btn::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background: var(--gold);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.55s var(--ease-out);
+}
+.btn:hover::before, .btn:focus-visible::before { transform: scaleY(1); }
+.btn:hover, .btn:focus-visible { color: var(--ink); }
+.btn__icon {
+  display: grid; place-items: center;
+  width: 1.6rem; height: 1.6rem;
+  transition: transform 0.55s var(--ease-out);
+}
+.btn:hover .btn__icon { transform: translateX(4px) rotate(-45deg); }
+.btn--gold { --bg: var(--gold); --fg: var(--ink); }
+.btn--gold::before { background: var(--bone); }
+.btn--light { --bg: var(--bone); --fg: var(--ink); }
+.btn--ghost {
+  --bg: transparent; --fg: currentColor;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.btn--ghost:hover { color: var(--ink); }
+.btn--block { width: 100%; justify-content: space-between; }
+
+.link-line {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-weight: 600;
+  padding-bottom: 0.2rem;
+}
+.link-line::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: currentColor; transform-origin: right; transform: scaleX(1);
+  transition: transform 0.6s var(--ease-out);
+}
+.link-line:hover::after { animation: line-swipe 0.8s var(--ease-out); }
+@keyframes line-swipe {
+  0% { transform: scaleX(1); transform-origin: right; }
+  45% { transform: scaleX(0); transform-origin: right; }
+  46% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Media                                                                       */
+/* -------------------------------------------------------------------------- */
+.media { position: relative; overflow: hidden; background: var(--ink-3); }
+.media img { width: 100%; height: 100%; object-fit: cover; }
+.media--parallax img { height: 120%; position: absolute; top: -10%; left: 0; }
+
+/* Linee tecniche decorative (stile tavola di progetto) */
+.ticks {
+  --c: var(--line-light);
+  background-image: repeating-linear-gradient(90deg, var(--c) 0 1px, transparent 1px 12px);
+  height: 8px;
+}
+.theme-dark .ticks { --c: var(--line-dark); }
+
+/* -------------------------------------------------------------------------- */
+/* Stato iniziale animazioni (solo con JS attivo, rispetta reduced-motion)     */
+/* -------------------------------------------------------------------------- */
+html.js [data-reveal] { opacity: 0; }
+html.js [data-reveal='clip'] { opacity: 1; clip-path: inset(100% 0 0 0); }
+html.js [data-split] { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal], html.js [data-split] { opacity: 1 !important; clip-path: none !important; transform: none !important; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

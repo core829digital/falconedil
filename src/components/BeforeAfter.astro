@@ -1,0 +1,42 @@
+---
+import type { ImageMetadata } from 'astro';
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+interface Props { before: ImageMetadata; after: ImageMetadata; title: string; place: string; ratio?: string; }
+const { before, after, title, place, ratio = '4 / 5' } = Astro.props;
+const id = `ba-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+<figure class="ba" data-ba style={`--ratio: ${ratio}`} data-cursor-text="Trascina">
+  <div class="ba__stage">
+    <div class="ba__img ba__after"><Img src={after} alt={`${title}, ${place} — dopo l’intervento`} sizes="(min-width: 900px) 45vw, 100vw" /></div>
+    <div class="ba__img ba__before"><Img src={before} alt={`${title}, ${place} — prima dell’intervento`} sizes="(min-width: 900px) 45vw, 100vw" /></div>
+    <span class="ba__tag ba__tag--l mono">Prima</span>
+    <span class="ba__tag ba__tag--r mono">Dopo</span>
+    <div class="ba__handle" aria-hidden="true"><span><Icon name="drag" size={18} /></span></div>
+    <label class="sr-only" for={id}>Confronta prima e dopo: {title}</label>
+    <input id={id} type="range" min="0" max="100" value="50" step="0.5" />
+  </div>
+  <figcaption class="ba__cap">
+    <span class="h3">{title}</span>
+    <span class="mono muted">{place}</span>
+  </figcaption>
+</figure>
+<style>
+  .ba { --pos: 50%; display: grid; gap: 1.1rem; }
+  .ba__stage { position: relative; aspect-ratio: var(--ratio); overflow: hidden; background: var(--ink-3); touch-action: pan-y; }
+  .ba__img { position: absolute; inset: 0; }
+  .ba__img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .ba__before { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+  .ba__handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: var(--bone); pointer-events: none; }
+  .ba__handle span {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 3.2rem; height: 3.2rem; border-radius: 50%; background: var(--gold); color: var(--ink);
+    display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .ba input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+  .ba input:focus-visible ~ .ba__handle span, .ba__stage:focus-within .ba__handle span { outline: 2px solid var(--bone); outline-offset: 3px; }
+  .ba__tag { position: absolute; top: 1rem; padding: 0.4rem 0.7rem; background: rgba(15,14,12,.7); color: var(--bone); pointer-events: none; }
+  .ba__tag--l { left: 1rem; }
+  .ba__tag--r { right: 1rem; background: var(--gold); color: var(--ink); }
+  .ba__cap { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+</style>

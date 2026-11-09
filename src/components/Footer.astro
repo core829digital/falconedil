@@ -1,0 +1,152 @@
+---
+import { company, offices, nav, servicesShortList } from '../data/site';
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
+<footer class="ftr theme-dark" data-footer>
+  <div class="container">
+    <div class="ftr__cta">
+      <p class="eyebrow">Richiedi un preventivo</p>
+      <h2 class="h1" data-split>
+        Pronti a lavorare insieme? <span class="serif gold">Costruisci un progetto con noi.</span>
+      </h2>
+      <div class="ftr__cta-actions" data-reveal="up">
+        <a href="/contatti/#preventivo" class="btn btn--gold" data-magnetic>
+          <span>Richiedi un preventivo</span>
+          <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+        </a>
+        <a href={`https://wa.me/${company.whatsapp}`} class="btn btn--ghost" target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={18} />
+          <span>Scrivici su WhatsApp</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="ftr__grid">
+      <div class="ftr__about">
+        <p class="mono gold">Falcon Edil</p>
+        <p class="muted">{company.description}</p>
+        <ul class="ftr__social" role="list">
+          {company.social.map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}>
+                <Icon name={s.label.toLowerCase() as 'facebook' | 'instagram' | 'linkedin'} size={18} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <p class="mono gold">Navigazione</p>
+        <ul role="list" class="ftr__list">
+          {nav.map((n) => <li><a class="link-hover" href={n.href}>{n.label}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <p class="mono gold">I nostri servizi</p>
+        <ul role="list" class="ftr__list">
+          {servicesShortList.map((s) => <li><a class="link-hover" href="/servizi/">{s}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <p class="mono gold">Contatti</p>
+        <ul role="list" class="ftr__list">
+          {offices.map((o) => (
+            <li>
+              <a class="link-hover" href={o.maps} target="_blank" rel="noopener">{o.full}</a>
+            </li>
+          ))}
+          <li><a class="link-hover" href={`mailto:${company.email}`}>{company.email}</a></li>
+          <li><a class="link-hover" href={`mailto:${company.emailFounder}`}>{company.emailFounder}</a></li>
+          {offices.map((o) => (
+            <li><a class="link-hover" href={o.phoneHref}>Tel. {o.countryCode} {o.phone}</a></li>
+          ))}
+        </ul>
+        <div class="ftr__hours">
+          <Icon name="clock" size={16} />
+          <div>
+            {company.hours.map((h) => <p><span>{h.days}</span> <span class="muted">{h.time}</span></p>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr__word" aria-hidden="true" data-footer-word>
+    <span>Falcon</span><span class="gold">Edil</span>
+  </div>
+
+  <div class="container ftr__legal">
+    <p>© {year} Falcon Edil ® Tutti i diritti riservati · P.IVA {company.vat}</p>
+    <ul role="list">
+      <li><a class="link-hover" href="/info-sulla-privacy/">Privacy</a></li>
+      <li><a class="link-hover" href="/politica-sui-cookie-eu/">Cookie</a></li>
+      <li><a class="link-hover" href="/termini-e-condizioni/">Termini e condizioni</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .ftr { padding-top: var(--section); overflow: hidden; position: relative; }
+  .ftr__cta { display: grid; gap: 2rem; padding-bottom: var(--section); border-bottom: 1px solid var(--line-dark); }
+  .ftr__cta h2 { max-width: 18ch; }
+  .ftr__cta-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+  .ftr__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr 1.1fr 1.3fr;
+    gap: clamp(2rem, 4vw, 4rem);
+    padding-block: clamp(3rem, 6vw, 5rem);
+    font-size: var(--fs-sm);
+  }
+  .ftr__grid > div > .mono { margin-bottom: 1.1rem; }
+  .ftr__about p.muted { max-width: 40ch; }
+  .ftr__list { display: grid; gap: 0.55rem; }
+  .link-hover { transition: color 0.3s; }
+  .link-hover:hover { color: var(--gold-2); }
+  .ftr__social { display: flex; gap: 0.6rem; margin-top: 1.5rem; }
+  .ftr__social a {
+    display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-dark); transition: background 0.3s, color 0.3s;
+  }
+  .ftr__social a:hover { background: var(--gold); color: var(--ink); }
+  .ftr__hours { display: flex; gap: 0.6rem; margin-top: 1.4rem; color: var(--gold-2); }
+  .ftr__hours p { color: var(--bone); display: flex; gap: 0.6rem; }
+
+  .ftr__word {
+    display: flex;
+    justify-content: center;
+    gap: 0.06em;
+    font-size: clamp(3rem, 11.4vw, 17rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 125;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    line-height: 0.78;
+    white-space: nowrap;
+    user-select: none;
+    padding-top: 1rem;
+    color: var(--ink-3);
+    -webkit-text-stroke: 1px rgba(242, 237, 228, 0.12);
+  }
+  .ftr__word .gold { color: transparent; -webkit-text-stroke: 1px rgba(192, 138, 53, 0.65); }
+
+  .ftr__legal {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem;
+    padding-block: 1.6rem;
+    border-top: 1px solid var(--line-dark);
+    font-size: var(--fs-xs);
+    color: rgba(242, 237, 228, 0.6);
+  }
+  .ftr__legal ul { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+  @media (max-width: 1024px) {
+    .ftr__grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .ftr__grid { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,24 @@
+---
+interface Props { index?: string; eyebrow: string; title: string; accent?: string; lead?: string; align?: 'start' | 'split'; }
+const { index, eyebrow, title, accent, lead, align = 'split' } = Astro.props;
+---
+<div class:list={['shead', `shead--${align}`]}>
+  <div class="shead__top">
+    {index && <span class="mono shead__index" data-reveal="fade">{index}</span>}
+    <p class="eyebrow" data-reveal="fade">{eyebrow}</p>
+  </div>
+  <h2 class="h2" data-split>{title}{accent && <> <span class="serif gold">{accent}</span></>}</h2>
+  {lead && <p class="lead muted" data-reveal="up">{lead}</p>}
+  <slot />
+</div>
+<style>
+  .shead { display: grid; gap: 1.5rem; margin-bottom: clamp(2.5rem, 5vw, 4.5rem); }
+  .shead__top { display: flex; align-items: center; gap: 1.25rem; }
+  .shead__index { color: var(--stone); }
+  .shead h2 { max-width: 20ch; }
+  @media (min-width: 900px) {
+    .shead--split { grid-template-columns: 1.2fr 1fr; align-items: end; column-gap: var(--gutter); }
+    .shead--split .shead__top { grid-column: 1 / -1; }
+    .shead--split .lead { justify-self: end; }
+  }
+</style>

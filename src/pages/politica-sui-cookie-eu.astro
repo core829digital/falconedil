@@ -1,0 +1,37 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { company } from '../data/site';
+---
+<Legal
+  title="Politica sui cookie (UE)"
+  description="Politica sui cookie del sito Falcon Edil: nessun cookie di profilazione o di tracciamento."
+  heading="Politica sui cookie"
+  updated="9 novembre 2026"
+  path="/politica-sui-cookie-eu/"
+>
+  <div class="legal-box">
+    <p><strong>In breve:</strong> questo sito non installa cookie di profilazione, di marketing o di statistica di terze parti. Per questo motivo non è necessario alcun banner di consenso.</p>
+  </div>
+
+  <h2>1. Cosa sono i cookie</h2>
+  <p>I cookie sono piccoli file di testo che i siti visitati inviano al dispositivo dell’utente, dove vengono memorizzati per essere ritrasmessi agli stessi siti alla visita successiva. Tecnologie simili (come il <em>local/session storage</em> del browser) funzionano in modo analogo.</p>
+
+  <h2>2. Strumenti utilizzati da questo sito</h2>
+  <table>
+    <thead><tr><th>Nome</th><th>Tipo</th><th>Finalità</th><th>Durata</th></tr></thead>
+    <tbody>
+      <tr><td><code>fe-loaded</code></td><td>Session storage tecnico</td><td>Evita di mostrare l’animazione di caricamento iniziale più di una volta per sessione</td><td>Fino alla chiusura della scheda</td></tr>
+    </tbody>
+  </table>
+  <p>Si tratta di uno strumento strettamente tecnico, che non contiene dati personali e per il quale, ai sensi dell’art. 122 del Codice Privacy e delle Linee guida del Garante del 10 giugno 2021, non è richiesto il consenso.</p>
+  <p>I caratteri tipografici sono ospitati direttamente sul server del sito: nessuna richiesta viene inviata a servizi esterni come Google Fonts.</p>
+
+  <h2>3. Servizi di terze parti</h2>
+  <p>I pulsanti verso WhatsApp, Google Maps, Facebook, Instagram e LinkedIn sono semplici collegamenti: nessun contenuto di terze parti viene caricato finché l’utente non li utilizza. Una volta aperti, tali servizi applicano le proprie politiche sui cookie.</p>
+
+  <h2>4. Come gestire i cookie</h2>
+  <p>L’utente può in ogni momento cancellare o bloccare cookie e dati del sito dalle impostazioni del proprio browser.</p>
+
+  <h2>5. Contatti</h2>
+  <p>Per qualsiasi domanda: <a href={`mailto:${company.email}`}>{company.email}</a>. Per maggiori informazioni sul trattamento dei dati consulta l’<a href="/info-sulla-privacy/">Informativa sulla privacy</a>.</p>
+</Legal>

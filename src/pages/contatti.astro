@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { images, offices, company } from '../data/site';
+---
+<Base
+  title="Contatti — Richiedi un preventivo a Falcon Edil"
+  description="Contatta Falcon Edil: sede di Trinitapoli (BT), Via Libertà 8 — tel. +39 366 7141862; sede di Sofia — tel. +359 877 632714. Email info@falconedil.com. Lun–Sab 07:00–18:00."
+  image={images.consulente}
+  breadcrumbs={[{ name: 'Contatti', href: '/contatti/' }]}
+>
+  <PageHero
+    crumb="Contatti"
+    eyebrow="Come contattarci"
+    title="Parliamo del"
+    accent="tuo progetto."
+    lead="Raccontaci cosa vuoi costruire o ristrutturare: ti rispondiamo con le indicazioni per un sopralluogo e un preventivo dettagliato."
+    image={images.consulente}
+    imageAlt="Il geometra Emanuele Falcone in ufficio durante una consulenza"
+  >
+    <div class="quick" data-reveal="up" data-hero data-delay="0.7">
+      <a href={offices[0].phoneHref} class="btn btn--gold" data-magnetic><Icon name="phone" size={18} /><span>{offices[0].phone}</span></a>
+      <a href={`https://wa.me/${company.whatsapp}`} target="_blank" rel="noopener" class="btn btn--ghost" data-magnetic><Icon name="whatsapp" size={18} /><span>WhatsApp</span></a>
+      <a href={`mailto:${company.email}`} class="btn btn--ghost" data-magnetic><Icon name="mail" size={18} /><span>Email</span></a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container">
+      <div class="branches-head">
+        <p class="eyebrow" data-reveal="fade">Le nostre filiali</p>
+        <h2 class="h2" data-split>Dettagli <span class="serif gold">di contatto.</span></h2>
+      </div>
+      <div class="branches">
+        {offices.map((o, i) => (
+          <article class="branch" data-reveal="up" data-delay={String(i * 0.1)}>
+            <header class="branch__head">
+              <span class="mono gold-3">{String(i + 1).padStart(2, '0')} — {o.countryCode}</span>
+              <span class="mono muted">{o.coordsLabel}</span>
+            </header>
+            <h3 class="branch__title">{o.label}</h3>
+            <dl class="branch__list">
+              <div>
+                <dt class="mono"><Icon name="pin" size={16} /> Indirizzo</dt>
+                <dd><a href={o.maps} target="_blank" rel="noopener" class="link-line">{o.full}</a></dd>
+              </div>
+              <div>
+                <dt class="mono"><Icon name="phone" size={16} /> Telefono</dt>
+                <dd><a href={o.phoneHref} class="link-line">{o.phone}</a></dd>
+              </div>
+              <div>
+                <dt class="mono"><Icon name="mail" size={16} /> Email</dt>
+                <dd class="branch__mails">
+                  <a href={`mailto:${company.emailFounder}`} class="link-line">{company.emailFounder}</a>
+                  <a href={`mailto:${company.email}`} class="link-line">{company.email}</a>
+                </dd>
+              </div>
+            </dl>
+            <a href="#preventivo" class="btn branch__cta" data-magnetic>
+              <span>Fissate un appuntamento</span>
+              <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section theme-dark form-sec" id="preventivo">
+    <div class="container form-sec__grid">
+      <div class="form-sec__intro">
+        <p class="eyebrow" data-reveal="fade">Richiedi un preventivo</p>
+        <h2 class="h1" data-split>Pronti a lavorare <span class="serif gold">insieme?</span></h2>
+        <p class="muted" data-reveal="up">Compila il modulo con qualche dettaglio sul lavoro: tipo di intervento, località e tempistiche. Più informazioni ci dai, più precisa sarà la nostra risposta.</p>
+        <ul class="form-sec__facts" role="list" data-reveal="stagger">
+          <li><Icon name="clock" size={20} /><div><strong>Orari</strong><span class="muted">{company.hours.map((h) => `${h.days}: ${h.time}`).join(' · ')}</span></div></li>
+          <li><Icon name="shield" size={20} /><div><strong>Dati protetti</strong><span class="muted">Usati solo per risponderti, mai ceduti a terzi.</span></div></li>
+          <li><Icon name="whatsapp" size={20} /><div><strong>Preferisci scrivere?</strong><a class="link-line" href={`https://wa.me/${company.whatsapp}`} target="_blank" rel="noopener">Apri la chat WhatsApp</a></div></li>
+        </ul>
+      </div>
+      <div class="form-sec__form" data-reveal="up">
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .quick { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+  .branches-head { display: grid; gap: 1.2rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .branches { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); }
+  .branch { display: grid; gap: 1.6rem; padding: clamp(1.6rem, 3vw, 2.8rem); background: var(--bone); align-content: start; }
+  .branch__head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .gold-3 { color: var(--gold-3); }
+  .branch__title { font-size: clamp(1.8rem, 1.2rem + 2vw, 3rem); font-weight: 650; font-variation-settings: 'wdth' 108; letter-spacing: -0.035em; line-height: 1; }
+  .branch__list { display: grid; gap: 1.2rem; border-top: 1px solid var(--line-light); padding-top: 1.5rem; }
+  .branch__list dt { display: flex; align-items: center; gap: 0.5rem; color: var(--stone); margin-bottom: 0.35rem; }
+  .branch__list dd { font-size: var(--fs-lg); font-weight: 550; }
+  .branch__mails { display: grid; gap: 0.3rem; justify-items: start; font-size: var(--fs-md) !important; }
+  .branch__cta { justify-self: start; }
+  @media (max-width: 860px) { .branches { grid-template-columns: 1fr; } }
+
+  .form-sec__grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(2.5rem, 6vw, 7rem); align-items: start; }
+  .form-sec__intro { display: grid; gap: 1.6rem; position: sticky; top: calc(var(--header-h) + 2rem); }
+  .form-sec__facts { display: grid; gap: 1.2rem; margin-top: 1rem; padding-top: 1.6rem; border-top: 1px solid var(--line-dark); }
+  .form-sec__facts li { display: flex; gap: 1rem; align-items: flex-start; }
+  .form-sec__facts :global(svg) { color: var(--gold-2); flex-shrink: 0; margin-top: 0.15rem; }
+  .form-sec__facts div { display: grid; gap: 0.2rem; font-size: var(--fs-sm); justify-items: start; }
+  .form-sec__form { background: var(--ink-2); border: 1px solid var(--line-dark); padding: clamp(1.5rem, 4vw, 3.5rem); }
+  @media (max-width: 1023px) { .form-sec__grid { grid-template-columns: 1fr; } .form-sec__intro { position: static; } }
+</style>

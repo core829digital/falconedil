@@ -1,0 +1,123 @@
+---
+import Icon from './Icon.astro';
+import { company } from '../data/site';
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || '';
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY || '';
+const interventi = [
+  'Nuova costruzione',
+  'Ristrutturazione / restauro',
+  'Ripristino lastrico / pavimento solare',
+  'Tinteggiatura',
+  'Impianti elettrici e idraulici',
+  'Consulenza / progettazione',
+  'Servizio gru',
+  'Altro',
+];
+---
+<form class="form" data-contact-form data-endpoint={endpoint} data-access-key={accessKey || undefined} data-mailto={company.email} novalidate>
+  <div class="form__row">
+    <div class="field">
+      <input id="f-nome" name="nome" type="text" autocomplete="given-name" required placeholder=" " />
+      <label for="f-nome">Nome *</label>
+    </div>
+    <div class="field">
+      <input id="f-cognome" name="cognome" type="text" autocomplete="family-name" required placeholder=" " />
+      <label for="f-cognome">Cognome *</label>
+    </div>
+  </div>
+  <div class="form__row">
+    <div class="field">
+      <input id="f-email" name="email" type="email" autocomplete="email" required placeholder=" " />
+      <label for="f-email">Email *</label>
+    </div>
+    <div class="field">
+      <input id="f-tel" name="telefono" type="tel" autocomplete="tel" placeholder=" " inputmode="tel" />
+      <label for="f-tel">Telefono</label>
+    </div>
+  </div>
+  <div class="form__row">
+    <div class="field field--select">
+      <select id="f-int" name="intervento">
+        <option value="">Seleziona…</option>
+        {interventi.map((i) => <option>{i}</option>)}
+      </select>
+      <label for="f-int" class="is-fixed">Tipo di intervento</label>
+    </div>
+    <div class="field">
+      <input id="f-loc" name="localita" type="text" autocomplete="address-level2" placeholder=" " />
+      <label for="f-loc">Località del lavoro</label>
+    </div>
+  </div>
+  <div class="field">
+    <textarea id="f-msg" name="messaggio" rows="5" required placeholder=" "></textarea>
+    <label for="f-msg">Raccontaci il tuo progetto *</label>
+  </div>
+  <div class="hp" aria-hidden="true">
+    <label for="f-hp">Non compilare</label>
+    <input id="f-hp" name="azienda_web" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <label class="check">
+    <input type="checkbox" name="privacy" required />
+    <span class="check__box" aria-hidden="true"><Icon name="check" size={14} /></span>
+    <span>Ho letto l’<a href="/info-sulla-privacy/" class="link-line">informativa privacy</a> e acconsento al trattamento dei dati per ricevere una risposta. *</span>
+  </label>
+  <div class="form__foot">
+    <button type="submit" class="btn btn--gold" data-magnetic>
+      <span>Invia la richiesta</span>
+      <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+    </button>
+    <p class="form__status" data-form-status role="status" aria-live="polite"></p>
+  </div>
+</form>
+<style>
+  .form { display: grid; gap: 1.4rem; }
+  .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .field { position: relative; }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    border-color: color-mix(in srgb, currentColor 30%, transparent);
+    padding: 1.6rem 0 0.7rem;
+    font-size: var(--fs-md);
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.3s;
+    appearance: none;
+  }
+  .field select { cursor: pointer; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 12px) 62%, calc(100% - 7px) 62%; background-size: 5px 5px; background-repeat: no-repeat; }
+  .field select option { color: var(--ink); }
+  .field textarea { resize: vertical; min-height: 8rem; }
+  .field label {
+    position: absolute; left: 0; top: 1.55rem;
+    color: color-mix(in srgb, currentColor 60%, transparent);
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform 0.45s var(--ease-out), color 0.3s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--gold); }
+  .field input:focus + label, .field textarea:focus + label,
+  .field input:not(:placeholder-shown) + label, .field textarea:not(:placeholder-shown) + label,
+  .field label.is-fixed { transform: translateY(-1.35rem) scale(0.78); color: var(--gold); }
+  :global(.was-validated) .field :invalid { border-color: var(--danger); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .check { display: flex; gap: 0.9rem; align-items: flex-start; font-size: var(--fs-sm); cursor: pointer; }
+  .check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .check__box {
+    flex-shrink: 0; width: 1.3rem; height: 1.3rem; margin-top: 0.15rem;
+    display: grid; place-items: center;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 45%, transparent);
+    color: transparent; transition: background 0.3s, color 0.3s;
+  }
+  .check input:checked + .check__box { background: var(--gold); color: var(--ink); box-shadow: none; }
+  .check input:focus-visible + .check__box { outline: 2px solid var(--gold); outline-offset: 2px; }
+  :global(.was-validated) .check input:invalid + .check__box { box-shadow: inset 0 0 0 1px var(--danger); }
+  .form__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem 2rem; margin-top: 0.6rem; }
+  .form__status { font-size: var(--fs-sm); max-width: 46ch; }
+  :global(.form__status.is-ok) { color: var(--ok); }
+  :global(.theme-dark .form__status.is-ok) { color: #8fc27f; }
+  :global(.form__status.is-error) { color: var(--danger); }
+  :global(.theme-dark .form__status.is-error) { color: #e48a72; }
+  @media (max-width: 640px) { .form__row { grid-template-columns: 1fr; } }
+</style>

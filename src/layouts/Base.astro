@@ -1,0 +1,325 @@
+---
+import '../styles/global.css';
+import { getImage, Image } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import { company, offices, images } from '../data/site';
+import ogDefault from '../assets/brand/og.jpg';
+
+interface Crumb { name: string; href: string }
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+  noindex?: boolean;
+  preloader?: boolean;
+  breadcrumbs?: Crumb[];
+  schema?: Record<string, unknown>[];
+}
+import type { ImageMetadata } from 'astro';
+
+const { title, description, image = ogDefault, noindex = false, preloader = false, breadcrumbs, schema = [] } = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).href;
+const fullTitle = title.includes('Falcon Edil') ? title : `${title} | Falcon Edil`;
+const og = await getImage({ src: image, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 82 });
+const ogUrl = new URL(og.src, site).href;
+const logo = await getImage({ src: images.emblem, width: 208, format: 'png' });
+const logoUrl = new URL(logo.src, site).href;
+
+const orgId = `${site.href}#organizzazione`;
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'Organization',
+    '@id': orgId,
+    name: company.name,
+    url: site.href,
+    logo: logoUrl,
+    email: company.email,
+    vatID: `IT${company.vat}`,
+    founder: { '@type': 'Person', name: company.founder, jobTitle: 'Geometra' },
+    sameAs: company.social.map((s) => s.href),
+    subOrganization: offices.map((o) => ({ '@id': `${site.href}#sede-${o.id}` })),
+  },
+  ...offices.map((o) => ({
+    '@type': 'GeneralContractor',
+    '@id': `${site.href}#sede-${o.id}`,
+    name: `${company.name} — ${o.label}`,
+    parentOrganization: { '@id': orgId },
+    url: site.href,
+    image: ogUrl,
+    logo: logoUrl,
+    telephone: o.phone.replace(/\s/g, ''),
+    email: company.email,
+    priceRange: '€€',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: o.street,
+      postalCode: o.postalCode,
+      addressLocality: o.city,
+      addressRegion: o.region,
+      addressCountry: o.countryCode,
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: o.coords.lat, longitude: o.coords.lng },
+    hasMap: o.maps,
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        opens: '07:00',
+        closes: '18:00',
+      },
+    ],
+    areaServed: ['IT', 'BG', 'FR'],
+    knowsAbout: [
+      'Costruzione di appartamenti',
+      'Ristrutturazioni',
+      'Restauro di edifici',
+      'Ripristino lastrici solari',
+      'Impianti elettrici e idraulici',
+      'Consulenza edilizia',
+    ],
+  })),
+  {
+    '@type': 'WebSite',
+    '@id': `${site.href}#sito`,
+    url: site.href,
+    name: company.name,
+    inLanguage: 'it-IT',
+    publisher: { '@id': orgId },
+  },
+  {
+    '@type': 'WebPage',
+    '@id': `${canonical}#pagina`,
+    url: canonical,
+    name: fullTitle,
+    description,
+    inLanguage: 'it-IT',
+    isPartOf: { '@id': `${site.href}#sito` },
+    primaryImageOfPage: ogUrl,
+  },
+];
+if (breadcrumbs?.length) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    itemListElement: [{ name: 'Home', href: '/' }, ...breadcrumbs].map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: new URL(c.href, site).href,
+    })),
+  });
+}
+graph.push(...schema);
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+---
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#0f0e0c" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:site_name" content="Falcon Edil" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogUrl} />
+
+    <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <script is:inline define:vars={{ preloader }}>
+      document.documentElement.classList.add('js');
+      try {
+        if (
+          preloader &&
+          !sessionStorage.getItem('fe-loaded') &&
+          !matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          document.documentElement.classList.add('is-loading');
+        }
+      } catch (e) {}
+    </script>
+    <script type="application/ld+json" set:html={jsonLd} />
+  </head>
+  <body>
+    <a href="#contenuto" class="skip-link">Vai al contenuto</a>
+
+    {preloader && (
+      <div class="loader" data-loader aria-hidden="true">
+        <div class="loader__panel"></div>
+        <div class="loader__center">
+          <Image src={images.emblem} alt="" width={104} height={120} class="loader__emblem" loading="eager" />
+          <div class="loader__bar"><span data-loader-bar></span></div>
+          <div class="loader__meta mono">
+            <span>Trinitapoli · Sofia</span>
+            <span><span data-loader-count>0</span>%</span>
+          </div>
+        </div>
+      </div>
+    )}
+
+    <Header />
+
+    <main id="contenuto">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <!-- Contatto rapido -->
+    <a
+      class="wa"
+      href={`https://wa.me/${company.whatsapp}?text=${encodeURIComponent('Ciao Falcon Edil, vorrei informazioni per un lavoro.')}`}
+      target="_blank"
+      rel="noopener"
+      aria-label="Scrivici su WhatsApp"
+      data-magnetic
+    >
+      <Icon name="whatsapp" size={26} />
+      <span class="wa__label">Possiamo aiutarti?</span>
+    </a>
+
+    <nav class="dock" aria-label="Azioni rapide">
+      <a href={offices[0].phoneHref}><Icon name="phone" size={18} /><span>Chiama</span></a>
+      <a href="/contatti/#preventivo" class="dock__main"><span>Richiedi preventivo</span></a>
+    </nav>
+
+    <div class="cursor" aria-hidden="true" data-cursor><span data-cursor-label></span></div>
+
+    <script>
+      import '../scripts/main';
+    </script>
+
+    <style>
+      /* Preloader */
+      .loader { display: none; }
+      :global(html.is-loading) .loader {
+        display: grid;
+        place-items: center;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        color: var(--bone);
+      }
+      :global(html.is-loading) { overflow: hidden; }
+      .loader__panel { position: absolute; inset: 0; background: var(--ink); }
+      .loader__center { position: relative; display: grid; justify-items: center; gap: 1.6rem; width: min(320px, 70vw); }
+      .loader__emblem { width: 92px; height: auto; }
+      .loader__bar { width: 100%; height: 1px; background: var(--line-dark); overflow: hidden; }
+      .loader__bar span { display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+      .loader__meta { width: 100%; display: flex; justify-content: space-between; color: rgba(242, 237, 228, 0.6); }
+
+      /* WhatsApp */
+      .wa {
+        position: fixed;
+        right: clamp(1rem, 2vw, 1.75rem);
+        bottom: clamp(1rem, 2vw, 1.75rem);
+        z-index: 80;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        height: 3.6rem;
+        padding: 0 1.05rem;
+        border-radius: 999px;
+        background: #1f8f4e;
+        color: #fff;
+        box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.45);
+        transition: background 0.3s;
+      }
+      .wa:hover { background: #18773f; }
+      .wa__label {
+        max-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        transition: max-width 0.6s var(--ease-out);
+      }
+      .wa:hover .wa__label, .wa:focus-visible .wa__label { max-width: 12rem; }
+
+      /* Dock mobile */
+      .dock { display: none; }
+      @media (max-width: 720px) {
+        .dock {
+          position: fixed;
+          left: 0.75rem;
+          right: 0.75rem;
+          bottom: max(0.75rem, env(safe-area-inset-bottom));
+          z-index: 80;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 0.5rem;
+          padding: 0.4rem;
+          background: rgba(15, 14, 12, 0.92);
+          -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+          border-radius: 999px;
+          color: var(--bone);
+          box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.5);
+          transform: translateY(160%);
+          transition: transform 0.6s var(--ease-out);
+        }
+        :global(.dock.is-visible) { transform: none; }
+        .dock a {
+          display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+          height: 3rem; padding: 0 1.1rem; border-radius: 999px;
+          font-size: var(--fs-sm); font-weight: 600;
+        }
+        .dock__main { background: var(--gold); color: var(--ink); text-transform: uppercase; letter-spacing: 0.04em; }
+        .wa { bottom: calc(max(0.75rem, env(safe-area-inset-bottom)) + 4.6rem); height: 3.2rem; padding: 0 0.85rem; }
+      }
+
+      /* Cursore */
+      .cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 200;
+        width: 10px;
+        height: 10px;
+        margin: -5px 0 0 -5px;
+        border-radius: 50%;
+        background: var(--gold);
+        pointer-events: none;
+        display: none;
+        place-items: center;
+        mix-blend-mode: normal;
+        transition: width 0.45s var(--ease-out), height 0.45s var(--ease-out), margin 0.45s var(--ease-out), background 0.3s;
+      }
+      .cursor span {
+        font-family: var(--f-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      @media (hover: hover) and (pointer: fine) {
+        :global(html.has-cursor) .cursor { display: grid; }
+      }
+      :global(.cursor.is-label) { width: 92px; height: 92px; margin: -46px 0 0 -46px; }
+      :global(.cursor.is-label) span { opacity: 1; }
+      :global(.cursor.is-hidden) { width: 0; height: 0; margin: 0; }
+    </style>
+  </body>
+</html>

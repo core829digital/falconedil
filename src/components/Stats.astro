@@ -1,0 +1,39 @@
+---
+import { stats } from '../data/site';
+interface Props { tone?: 'dark' | 'light' }
+const { tone = 'light' } = Astro.props;
+---
+<ul class:list={['stats', `stats--${tone}`]} role="list" data-reveal="stagger">
+  {stats.map((s, i) => (
+    <li class="stat">
+      <span class="mono stat__i">{String(i + 1).padStart(2, '0')}</span>
+      <p class="stat__n"><span data-count={s.value}>{new Intl.NumberFormat('it-IT').format(s.value)}</span><span class="gold">{s.suffix}</span></p>
+      <p class="stat__l">{s.label}</p>
+    </li>
+  ))}
+</ul>
+<style>
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line-light); }
+  .stats--dark { border-color: var(--line-dark); }
+  .stat { padding: 1.75rem 1.5rem 0 0; display: grid; gap: 0.6rem; align-content: start; border-right: 1px solid var(--line-light); padding-left: 1.5rem; }
+  .stats--dark .stat { border-color: var(--line-dark); }
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: 0; }
+  .stat__i { color: var(--stone); }
+  .stat__n {
+    font-size: clamp(2.8rem, 1.6rem + 3.8vw, 5.8rem);
+    font-weight: 700; font-variation-settings: 'wdth' 112; letter-spacing: -0.05em; line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat__l { font-size: var(--fs-sm); max-width: 22ch; color: var(--stone-2); }
+  .stats--dark .stat__l { color: rgba(242,237,228,.65); }
+  @media (max-width: 860px) {
+    .stats { grid-template-columns: 1fr 1fr; row-gap: 2.5rem; }
+    .stat:nth-child(2) { border-right: 0; }
+    .stat:nth-child(3) { padding-left: 0; }
+  }
+  @media (max-width: 400px) {
+    .stat { padding-left: 0; padding-right: 0.75rem; }
+    .stat:nth-child(even) { padding-left: 0.75rem; }
+  }
+</style>

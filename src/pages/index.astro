@@ -1,0 +1,604 @@
+---
+import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Marquee from '../components/Marquee.astro';
+import Stats from '../components/Stats.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Faq from '../components/Faq.astro';
+import { images, services, guarantees, pillars, projects, leadership, offices, faqPlain, company } from '../data/site';
+
+const slides = [
+  { image: images.cantierePlovdiv, caption: 'Costruzione condominio — Plovdiv (BG)', alt: 'Struttura in calcestruzzo di un condominio in costruzione' },
+  { image: images.condominioDopo, caption: 'Restauro condominio — Trinitapoli (IT)', alt: 'Facciata di condominio restaurata a Trinitapoli' },
+  { image: images.cantiereTrinitapoli, caption: 'Cantiere — Trinitapoli (IT)', alt: 'Ponteggio su facciata durante i lavori' },
+  { image: images.operativita, caption: 'Restauro facciata — Trinitapoli (IT)', alt: 'Restauro di un edificio con piattaforma aerea' },
+];
+
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: faqPlain.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+<Base
+  title="Falcon Edil — Impresa edile a Trinitapoli (BT) e Sofia | Costruzioni e ristrutturazioni"
+  description="Falcon Edil: impresa edile con 16 anni di esperienza. Nuove costruzioni, ristrutturazioni, restauri, lastrici solari, impianti e consulenza in Italia e Bulgaria. Richiedi un preventivo."
+  preloader
+  schema={[faqSchema]}
+>
+  <!-- ============================== HERO ============================== -->
+  <section class="hero theme-dark" data-hero-section>
+    <div class="hero__media" data-hero-media>
+      {slides.map((s, i) => (
+        <div class="hero__slide" data-hero-slide data-caption={s.caption}>
+          <Img src={s.image} alt={s.alt} priority={i === 0} sizes="100vw" />
+        </div>
+      ))}
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+
+    <div class="hero__grid" aria-hidden="true">
+      <span data-draw-line class="v" style="left: 25%"></span>
+      <span data-draw-line class="v" style="left: 50%"></span>
+      <span data-draw-line class="v" style="left: 75%"></span>
+      <span data-draw-line class="h" style="top: 30%"></span>
+    </div>
+
+    <div class="hero__coords mono" aria-hidden="true" data-reveal="fade" data-hero data-delay="0.6">
+      <span>{offices[0].coordsLabel}</span>
+      <span>{offices[1].coordsLabel}</span>
+    </div>
+
+    <div class="container hero__content" data-hero-content>
+      <p class="eyebrow" data-reveal="fade" data-hero>Impresa edile · Trinitapoli (BT) · Sofia</p>
+      <h1 class="display hero__title" data-split data-split-hero>
+        Costruisci<br /> il tuo sogno
+      </h1>
+      <div class="hero__row">
+        <p class="hero__sub" data-reveal="up" data-hero data-delay="0.45">
+          <span class="serif gold">La visione si è ampliata.</span>
+          Nuove costruzioni, ristrutturazioni e restauri con {company.yearsExperience} anni di esperienza: dalla progettazione alla consegna, un unico interlocutore.
+        </p>
+        <div class="hero__ctas" data-reveal="up" data-hero data-delay="0.6">
+          <a href="/contatti/#preventivo" class="btn btn--gold" data-magnetic>
+            <span>Richiedi un preventivo</span>
+            <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+          </a>
+          <a href="/progetti/" class="btn btn--ghost" data-magnetic><span>Guarda i progetti</span></a>
+        </div>
+      </div>
+
+      <div class="hero__bottom" data-reveal="fade" data-hero data-delay="0.8">
+        <div class="hero__slideinfo">
+          <span class="mono"><span data-hero-index>01</span> / {String(slides.length).padStart(2, '0')}</span>
+          <span class="hero__progress"><span data-hero-progress></span></span>
+          <span class="mono hero__caption" data-hero-caption>{slides[0].caption}</span>
+        </div>
+        <a href="#chi-siamo" class="hero__scroll mono">
+          <span>Scorri</span>
+          <span class="hero__scroll-line" aria-hidden="true"></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Marquee tone="gold" items={['Nuove costruzioni', 'Ristrutturazioni', 'Restauro', 'Lastrici solari', 'Tinteggiatura', 'Impianti', 'Consulenza', 'Servizio gru']} speed={45} />
+
+  <!-- ============================== CHI SIAMO ============================== -->
+  <section class="section about" id="chi-siamo">
+    <div class="container about__grid">
+      <div class="about__media">
+        <div class="media about__img" data-reveal="clip">
+          <Img src={images.emanueleFalcone2} alt="Emanuele Falcone, geometra e legale rappresentante di Falcon Edil" sizes="(min-width: 1024px) 40vw, 100vw" />
+        </div>
+        <div class="about__badge" data-reveal="up" data-delay="0.3">
+          <span class="about__badge-n">16<span class="gold">+</span></span>
+          <span class="mono">Anni di successi<br />imbattibili</span>
+        </div>
+        <p class="about__sign" data-reveal="fade">
+          <span class="serif">Emanuele Falcone</span>
+          <span class="mono muted">Geometra · Legale rappresentante</span>
+        </p>
+      </div>
+
+      <div class="about__text">
+        <p class="eyebrow" data-reveal="fade">Costruisci la tua casa con Falcon Edil</p>
+        <h2 class="h2" data-split>16 anni di successi <span class="serif gold">imbattibili.</span></h2>
+        <div class="prose about__lead" data-reveal="up">
+          <p>Acquistare una casa non dovrebbe essere solo un atto pratico, ma anche un passo verso la realizzazione dei propri desideri e aspirazioni. È importante scegliere con cura la casa giusta, che rispecchi i propri sogni e le proprie ambizioni di vita.</p>
+          <p class="muted">Con sedici anni di esperienza come geometra e appaltatore edile, ho intrapreso un percorso di crescita professionale nel settore edile, affrontando ogni aspetto e ogni sfida del cantiere.</p>
+        </div>
+
+        <ol class="pillars" role="list">
+          {pillars.map((p, i) => (
+            <li class="pillar" data-reveal="up" data-delay={String(i * 0.06)}>
+              <span class="mono pillar__n">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <h3 class="pillar__t">{p.title}</h3>
+                <p class="muted">{p.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <blockquote class="about__quote" data-reveal="up">
+          <p class="serif">“Questi 16 anni rappresentano un percorso di crescita, apprendimento e contributo al settore edile, con un forte impegno nel garantire qualità e sicurezza nei progetti di costruzione.”</p>
+        </blockquote>
+
+        <div class="about__ctas" data-reveal="up">
+          <a href="/chi-siamo/" class="btn" data-magnetic>
+            <span>La nostra storia</span>
+            <span class="btn__icon"><Icon name="arrow" size={18} /></span>
+          </a>
+          <a href="/contatti/" class="link-line">Lavora con noi <Icon name="arrow-up-right" size={16} /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== NUMERI ============================== -->
+  <section class="section section--tight theme-dark numbers">
+    <div class="container">
+      <div class="numbers__head">
+        <p class="eyebrow" data-reveal="fade">In numeri</p>
+        <p class="h3 numbers__claim" data-split>Una tradizione di famiglia di costruttori, con un approccio <span class="serif gold">moderno.</span></p>
+      </div>
+      <Stats tone="dark" />
+    </div>
+  </section>
+
+  <!-- ============================== SERVIZI ============================== -->
+  <section class="section services" id="servizi">
+    <div class="container">
+      <SectionHead
+        index="01"
+        eyebrow="I nostri servizi"
+        title="Dalla prima pietra"
+        accent="all’ultima finitura."
+        lead="Progettazione e costruzione di edifici residenziali, commerciali e industriali, ristrutturazioni, manutenzioni e ampliamenti: materiali di qualità, tecniche avanzate e consegne puntuali."
+      />
+
+      <div class="slist" data-hover-list>
+        <ul role="list">
+          {services.map((s, i) => (
+            <li data-hover-item>
+              <a href={`/servizi/#${s.slug}`} class="slist__row" data-cursor-text="Scopri">
+                <span class="mono slist__n">{String(i + 1).padStart(2, '0')}</span>
+                <span class="slist__thumb media"><Img src={s.image} alt="" sizes="96px" widths={[192]} /></span>
+                <span class="slist__t">{s.title}</span>
+                <span class="slist__d muted">{s.short}</span>
+                <span class="slist__arrow" aria-hidden="true"><Icon name="arrow-up-right" size={22} /></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="slist__float" data-hover-float aria-hidden="true">
+          {services.map((s) => (
+            <div class="slist__float-img" data-hover-img><Img src={s.image} alt="" sizes="360px" widths={[480, 720]} /></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== GARANZIE ============================== -->
+  <section class="section theme-bone guarantees">
+    <div class="container">
+      <SectionHead index="02" eyebrow="Noi garantiamo" title="Servizi" accent="di qualità." lead="Competenza tecnica, personale qualificato e tecnologia: le basi su cui costruiamo ogni progetto, dall’inizio alla fine.">
+      </SectionHead>
+      <ul class="gcards" role="list">
+        {guarantees.map((g, i) => (
+          <li class="gcard" data-reveal="up" data-delay={String((i % 3) * 0.08)}>
+            <div class="media gcard__img">
+              <Img src={g.image} alt="" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" widths={[480, 768, 1080]} />
+            </div>
+            <div class="gcard__body">
+              <span class="mono gcard__n">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="h3">{g.title}</h3>
+              <p class="muted">{g.body}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== PRIMA / DOPO ============================== -->
+  <section class="section theme-dark ba-sec">
+    <div class="container">
+      <SectionHead index="03" eyebrow="I nostri ultimi lavori" title="Prima e dopo." accent="Trascina e confronta." lead="Il risultato di un lavoro meticoloso, verificabile con i tuoi occhi: sposta il cursore per vedere la trasformazione." />
+      <div class="ba-grid">
+        <BeforeAfter before={images.lastricoPrima} after={images.lastricoDopo} title="Restauro pavimentazione solare" place="Zapponeta (Italia)" />
+        <div class="ba-grid__offset">
+          <BeforeAfter before={images.condominioPrima} after={images.condominioDopo} title="Restauro condominio" place="Trinitapoli (Italia)" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== PROGETTI (orizzontale) ============================== -->
+  <section class="hs theme-dark" data-hscroll aria-labelledby="hs-title">
+    <div class="hs__track" data-hscroll-track>
+      <div class="hs__intro">
+        <p class="eyebrow">04 — Progetti</p>
+        <h2 class="h1" id="hs-title">Italia, Francia, <span class="serif gold">Bulgaria.</span></h2>
+        <p class="muted">Lavori completati e cantieri in corso: costruzioni, restauri e pavimentazioni realizzati con la stessa cura, ovunque.</p>
+        <a href="/progetti/" class="link-line">Tutti i progetti <Icon name="arrow" size={16} /></a>
+      </div>
+      {projects.map((p, i) => (
+        <a href="/progetti/" class="hs__card" data-cursor-text="Vedi">
+          <div class="media hs__img">
+            <div data-hscroll-img class="hs__img-in">
+              <Img src={p.image} alt={`${p.title} — ${p.place}`} sizes="(min-width: 1024px) 34vw, 85vw" widths={[480, 768, 1080]} />
+            </div>
+            <span class:list={['hs__status mono', { 'is-live': p.status === 'in-corso' }]}>
+              {p.status === 'in-corso' ? 'Lavori attuali' : 'Completato'}
+            </span>
+          </div>
+          <div class="hs__meta">
+            <span class="mono gold">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3 class="h3">{p.title}</h3>
+              <p class="mono muted">{p.place} · {p.country}</p>
+            </div>
+          </div>
+        </a>
+      ))}
+      <div class="hs__end">
+        <a href="/contatti/#preventivo" class="hs__endlink" data-cursor-text="Inizia">
+          <span class="h2">Il prossimo<br /><span class="serif gold">è il tuo.</span></span>
+          <span class="hs__endicon"><Icon name="arrow-up-right" size={40} /></span>
+        </a>
+      </div>
+    </div>
+    <div class="hs__bar container" aria-hidden="true"><span data-hscroll-bar></span></div>
+  </section>
+
+  <!-- ============================== SOSTENIBILITÀ ============================== -->
+  <section class="section sus">
+    <div class="container sus__grid">
+      <div class="sus__media">
+        <div class="media sus__img" data-reveal="clip">
+          <div data-parallax="16" class="sus__px"><Img src={images.sicurezza} alt="Squadra Falcon Edil con imbracature di sicurezza durante un lavoro in quota" sizes="(min-width: 1024px) 45vw, 100vw" /></div>
+        </div>
+        <div class="media sus__img2" data-reveal="clip" data-delay="0.2">
+          <Img src={images.mezzi} alt="Mezzi operativi Falcon Edil in cantiere" sizes="(min-width: 1024px) 20vw, 40vw" widths={[480, 720]} />
+        </div>
+      </div>
+      <div class="sus__text">
+        <p class="eyebrow" data-reveal="fade">Sostenibilità e sicurezza</p>
+        <h2 class="h2" data-split>Impegnati a mantenere le persone <span class="serif gold">sane e sicure.</span></h2>
+        <p class="lead muted" data-reveal="up">Per mantenere le persone in salute e al sicuro nel settore dell’edilizia è fondamentale rispettare le normative, fornire una formazione adeguata e promuovere l’innovazione, insieme alla collaborazione tra le diverse parti interessate.</p>
+        <div class="sus__practices" data-reveal="up">
+          <h3 class="h3">Seguiamo le migliori pratiche</h3>
+          <p class="muted">Ogni progetto di costruzione è unico. Collaboriamo con professionisti esperti ed affidabili e ci teniamo aggiornati sulle novità del settore: passaggi fondamentali per ottenere risultati di alta qualità.</p>
+        </div>
+        <ul class="sus__icons" role="list" data-reveal="stagger">
+          <li><Icon name="leaf" size={28} /><span>Sostenibilità</span></li>
+          <li><Icon name="timer" size={28} /><span>Progetti puntuali</span></li>
+          <li><Icon name="chip" size={28} /><span>Tecnologia moderna</span></li>
+        </ul>
+        <p class="sus__commit muted" data-reveal="up"><strong>Il nostro impegno costante.</strong> La conservazione delle risorse naturali, la riduzione dell’inquinamento e dell’impatto ambientale, la promozione dell’equità sociale e la garanzia della prosperità economica a lungo termine.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== PRESENZA ============================== -->
+  <section class="section theme-bone presence">
+    <div class="container">
+      <SectionHead index="05" eyebrow="Siamo presenti in…" title="Un’impresa italiana," accent="al lavoro in Europa." lead="Due sedi operative, un unico standard di qualità: dalla Puglia alla Bulgaria, fino ai cantieri in Francia." />
+      <div class="offices">
+        {offices.map((o) => (
+          <article class="office" data-reveal="up">
+            <div class="office__top">
+              <span class="mono">{o.countryCode}</span>
+              <span class="mono muted">{o.coordsLabel}</span>
+            </div>
+            <h3 class="office__country">{o.country}</h3>
+            <p class="office__addr">{o.full}</p>
+            <div class="office__links">
+              <a href={o.phoneHref} class="link-line"><Icon name="phone" size={16} /> {o.phone}</a>
+              <a href={o.maps} class="link-line" target="_blank" rel="noopener"><Icon name="pin" size={16} /> Apri in Maps</a>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <ul class="people" role="list">
+        {leadership.map((p, i) => (
+          <li class="person" data-reveal="up" data-delay={String(i * 0.08)}>
+            <div class="media person__img">
+              <Img src={p.image} alt={`${p.title} ${p.name}, ${p.role}`} sizes="(min-width: 860px) 28vw, 80vw" widths={[480, 768]} />
+            </div>
+            <p class="person__name">{p.name} <span class="muted">{p.title}</span></p>
+            <p class="mono gold-3">{p.role}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== TESTIMONIANZE ============================== -->
+  <section class="section theme-dark">
+    <div class="container">
+      <SectionHead index="06" eyebrow="Cosa dicono i nostri clienti" title="Testimonianze" accent="dal cantiere." lead="Panetterie, ville, case ottocentesche, concessionarie: le parole di chi ha costruito il proprio progetto con noi." />
+      <Testimonials />
+    </div>
+  </section>
+
+  <!-- ============================== FAQ ============================== -->
+  <section class="section faq-sec">
+    <div class="container faq-sec__grid">
+      <div class="faq-sec__head">
+        <p class="eyebrow" data-reveal="fade">Domande frequenti</p>
+        <h2 class="h2" data-split>Le risposte, <span class="serif gold">prima di iniziare.</span></h2>
+        <p class="muted" data-reveal="up">Hai un dubbio che non trovi qui? Parla direttamente con il geometra Falcone.</p>
+        <a href={`https://wa.me/${company.whatsapp}`} target="_blank" rel="noopener" class="btn" data-reveal="up" data-magnetic>
+          <Icon name="whatsapp" size={18} />
+          <span>Chiedi su WhatsApp</span>
+        </a>
+      </div>
+      <Faq />
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------- HERO ---------------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    padding-top: calc(var(--header-h) + 2rem);
+  }
+  .hero__media { position: absolute; inset: 0; }
+  .hero__slide { position: absolute; inset: 0; overflow: hidden; }
+  .hero__slide:not(:first-child) { opacity: 0; }
+  .hero__slide :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .hero__shade {
+    position: absolute; inset: 0; z-index: 3;
+    background:
+      linear-gradient(to top, rgba(15,14,12,.96) 0%, rgba(15,14,12,.6) 38%, rgba(15,14,12,.25) 70%, rgba(15,14,12,.55) 100%),
+      linear-gradient(100deg, rgba(15,14,12,.65), transparent 65%);
+  }
+  .hero__grid { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+  .hero__grid span { position: absolute; background: var(--line-dark); }
+  .hero__grid .v { top: 0; bottom: 0; width: 1px; transform-origin: top; }
+  .hero__grid .h { left: 0; right: 0; height: 1px; transform-origin: left; }
+  .hero__coords {
+    position: absolute; z-index: 5; right: var(--gutter); top: 50%;
+    writing-mode: vertical-rl; display: flex; gap: 2rem; color: rgba(242,237,228,.5);
+    transform: translateY(-50%);
+  }
+  .hero__content { position: relative; z-index: 5; display: grid; gap: clamp(1.25rem, 2.5vw, 2rem); }
+  .hero__title { max-width: 11ch; }
+  .hero__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 2rem; }
+  .hero__sub { max-width: 48ch; font-size: var(--fs-lg); color: rgba(242,237,228,.82); }
+  .hero__sub .serif { display: block; font-size: 1.5em; line-height: 1.1; margin-bottom: 0.5rem; }
+  .hero__ctas { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+  .hero__bottom {
+    display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
+    border-top: 1px solid var(--line-dark);
+    padding-block: 1.3rem 1.6rem;
+    margin-top: clamp(0.5rem, 2vw, 1.5rem);
+  }
+  .hero__slideinfo { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+  .hero__progress { width: 5rem; height: 1px; background: var(--line-dark); flex-shrink: 0; overflow: hidden; }
+  .hero__progress span { display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+  .hero__caption { color: rgba(242,237,228,.65); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero__scroll { display: flex; align-items: center; gap: 0.8rem; color: rgba(242,237,228,.75); }
+  .hero__scroll-line { position: relative; width: 1px; height: 2.6rem; background: var(--line-dark); overflow: hidden; }
+  .hero__scroll-line::after {
+    content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 40%; background: var(--gold);
+    animation: scrollcue 2s var(--ease-in-out) infinite;
+  }
+  @keyframes scrollcue { from { transform: translateY(-100%); } to { transform: translateY(260%); } }
+  @media (max-width: 900px) {
+    .hero__row { grid-template-columns: 1fr; }
+    .hero__coords { display: none; }
+  }
+  @media (max-width: 560px) {
+    .hero__caption { display: none; }
+    .hero__ctas .btn { flex: 1 1 100%; justify-content: space-between; }
+  }
+
+  /* ---------------- ABOUT ---------------- */
+  .about__grid { display: grid; grid-template-columns: 5fr 6fr; gap: clamp(2rem, 6vw, 7rem); align-items: start; }
+  .about__media { position: sticky; top: calc(var(--header-h) + 2rem); }
+  .about__img { aspect-ratio: 4 / 5; }
+  .about__badge {
+    position: absolute; right: -1.5rem; bottom: 5rem;
+    background: var(--gold); color: var(--ink);
+    padding: 1.2rem 1.4rem; display: grid; gap: 0.4rem;
+  }
+  .about__badge .gold { color: var(--bone); }
+  .about__badge-n { font-size: 3.4rem; font-weight: 750; font-variation-settings: 'wdth' 115; line-height: 0.9; letter-spacing: -0.04em; }
+  .about__sign { display: flex; flex-direction: column; gap: 0.2rem; margin-top: 1.2rem; }
+  .about__sign .serif { font-size: 1.8rem; line-height: 1; }
+  .about__text { display: grid; gap: 1.8rem; padding-top: 1rem; }
+  .about__lead { font-size: var(--fs-lg); }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line-light); }
+  .pillar { display: grid; grid-template-columns: auto 1fr; gap: 1rem; padding: 1.5rem 1.5rem 1.5rem 0; border-bottom: 1px solid var(--line-light); }
+  .pillar:nth-child(odd) { border-right: 1px solid var(--line-light); }
+  .pillar:nth-child(even) { padding-left: 1.5rem; }
+  .pillar__n { color: var(--gold-3); padding-top: 0.2rem; }
+  .pillar__t { font-size: 1.1rem; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+  .pillar p { font-size: var(--fs-sm); }
+  .about__quote { border-left: 2px solid var(--gold); padding-left: 1.5rem; }
+  .about__quote p { font-size: clamp(1.3rem, 1rem + 1vw, 1.9rem); line-height: 1.3; }
+  .about__ctas { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+  @media (max-width: 1023px) {
+    .about__grid { grid-template-columns: 1fr; }
+    .about__media { position: relative; top: 0; max-width: 560px; }
+    .about__badge { right: 1rem; }
+  }
+  @media (max-width: 600px) {
+    .pillars { grid-template-columns: 1fr; }
+    .pillar:nth-child(odd) { border-right: 0; }
+    .pillar:nth-child(even) { padding-left: 0; }
+  }
+
+  /* ---------------- NUMBERS ---------------- */
+  .numbers__head { display: grid; grid-template-columns: 1fr 2fr; gap: var(--gutter); margin-bottom: clamp(2.5rem, 5vw, 4rem); align-items: start; }
+  .numbers__claim { max-width: 26ch; font-size: var(--fs-2xl); }
+  @media (max-width: 800px) { .numbers__head { grid-template-columns: 1fr; } }
+
+  /* ---------------- SERVICES LIST ---------------- */
+  .slist { position: relative; }
+  .slist ul { border-top: 1px solid var(--line-light); }
+  .slist__row {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1.3fr) minmax(0, 1fr) 3rem;
+    align-items: center;
+    gap: 1.5rem;
+    padding-block: clamp(1.4rem, 2.4vw, 2.2rem);
+    border-bottom: 1px solid var(--line-light);
+    position: relative;
+    transition: padding 0.6s var(--ease-out), color 0.4s;
+  }
+  .slist__row::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; background: var(--ink);
+    transform: scaleY(0); transform-origin: bottom; transition: transform 0.6s var(--ease-out);
+  }
+  .slist__thumb { display: none; }
+  .slist__n { color: var(--gold-3); }
+  .slist__t { font-size: clamp(1.4rem, 1rem + 1.6vw, 2.6rem); font-weight: 600; font-variation-settings: 'wdth' 106; letter-spacing: -0.03em; line-height: 1.05; }
+  .slist__d { font-size: var(--fs-sm); max-width: 36ch; }
+  .slist__arrow { justify-self: end; transition: transform 0.6s var(--ease-out); }
+  @media (hover: hover) {
+    .slist__row:hover { color: var(--bone); padding-inline: 1.5rem; }
+    .slist__row:hover::before { transform: scaleY(1); }
+    .slist__row:hover .slist__d { color: rgba(242,237,228,.7); }
+    .slist__row:hover .slist__n { color: var(--gold-2); }
+    .slist__row:hover .slist__arrow { transform: rotate(45deg); color: var(--gold); }
+  }
+  .slist__float {
+    position: absolute; top: 0; left: 0; z-index: 5;
+    width: clamp(220px, 22vw, 340px); aspect-ratio: 4 / 5;
+    margin: calc(clamp(220px, 22vw, 340px) * -0.625) 0 0 calc(clamp(220px, 22vw, 340px) * -0.5);
+    pointer-events: none; opacity: 0; transform: scale(0.6);
+    overflow: hidden;
+  }
+  .slist__float-img { position: absolute; inset: 0; opacity: 0; }
+  .slist__float-img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 860px) {
+    .slist__row { grid-template-columns: 4.5rem minmax(0, 1fr) 2rem; gap: 0.4rem 1rem; }
+    .slist__n { display: none; }
+    .slist__thumb { display: block; grid-row: span 2; width: 4.5rem; aspect-ratio: 1; }
+    .slist__t { grid-column: 2; }
+    .slist__d { grid-column: 2; }
+    .slist__arrow { grid-column: 3; grid-row: 1 / span 2; }
+    .slist__float { display: none; }
+  }
+
+  /* ---------------- GUARANTEES ---------------- */
+  .gcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.5rem, 3vw, 2.5rem) var(--gutter); }
+  .gcard { display: grid; gap: 1.3rem; align-content: start; }
+  .gcard__img { aspect-ratio: 4 / 3; }
+  .gcard__img :global(img) { transition: transform 1.2s var(--ease-out), filter 0.8s; filter: saturate(0.85); }
+  .gcard:hover .gcard__img :global(img) { transform: scale(1.06); filter: saturate(1.05); }
+  .gcard__body { display: grid; gap: 0.6rem; }
+  .gcard__n { color: var(--gold-3); }
+  .gcard p { font-size: var(--fs-sm); }
+  @media (max-width: 1023px) { .gcards { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .gcards { grid-template-columns: 1fr; } }
+
+  /* ---------------- BEFORE / AFTER ---------------- */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); align-items: start; }
+  .ba-grid__offset { margin-top: clamp(0rem, 10vw, 9rem); }
+  @media (max-width: 800px) { .ba-grid { grid-template-columns: 1fr; } .ba-grid__offset { margin-top: 1.5rem; } }
+
+  /* ---------------- HORIZONTAL PROJECTS ---------------- */
+  .hs { position: relative; overflow: hidden; padding-block: clamp(4rem, 8vw, 6rem); border-top: 1px solid var(--line-dark); }
+  .hs__track { display: flex; gap: clamp(1.5rem, 3vw, 3rem); padding-inline: var(--gutter); width: max-content; align-items: stretch; }
+  .hs__intro { width: min(420px, 80vw); display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; flex-shrink: 0; padding-right: 2rem; }
+  .hs__card { width: clamp(300px, 34vw, 520px); flex-shrink: 0; display: grid; gap: 1.2rem; align-content: start; }
+  .hs__img { aspect-ratio: 4 / 5; }
+  .hs__img-in { position: absolute; inset: 0 -10%; }
+  .hs__img-in :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+  .hs__card:hover .hs__img-in :global(img) { transform: scale(1.05); }
+  .hs__status {
+    position: absolute; left: 1rem; top: 1rem; padding: 0.45rem 0.75rem;
+    background: rgba(15,14,12,.75); color: var(--bone); display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .hs__status.is-live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(192,138,53,.7); } 70% { box-shadow: 0 0 0 9px rgba(192,138,53,0); } 100% { box-shadow: 0 0 0 0 rgba(192,138,53,0); } }
+  .hs__meta { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.5rem; }
+  .hs__meta h3 { margin-bottom: 0.35rem; }
+  .hs__end { width: min(460px, 80vw); flex-shrink: 0; display: flex; }
+  .hs__endlink {
+    flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2rem;
+    border: 1px solid var(--line-dark); transition: background 0.5s, color 0.5s;
+    aspect-ratio: 4 / 5; align-self: start;
+  }
+  .hs__endlink:hover { background: var(--gold); color: var(--ink); }
+  .hs__endlink:hover .gold { color: var(--ink); }
+  .hs__endicon { align-self: flex-end; }
+  .hs__bar { margin-top: 2.5rem; height: 1px; position: relative; }
+  .hs__bar::before { content: ''; position: absolute; inset: 0 var(--gutter); background: var(--line-dark); }
+  .hs__bar span { position: absolute; inset: 0 var(--gutter); background: var(--gold); transform: scaleX(0); transform-origin: left; }
+  @media (min-width: 1024px) {
+    .hs { height: 100vh; min-height: 640px; display: flex; flex-direction: column; justify-content: center; padding-block: calc(var(--header-h) * 0.5) 0; }
+    .hs__card { width: calc(min(58vh, 620px) * 0.8); }
+    .hs__img { height: min(58vh, 620px); aspect-ratio: auto; }
+    .hs__endlink { height: min(58vh, 620px); aspect-ratio: auto; }
+  }
+  @media (max-width: 1023px) {
+    .hs__track { overflow-x: auto; width: auto; scroll-snap-type: x mandatory; padding-bottom: 1rem; scrollbar-width: none; }
+    .hs__track::-webkit-scrollbar { display: none; }
+    .hs__card, .hs__end, .hs__intro { scroll-snap-align: start; }
+    .hs__card { width: 78vw; }
+    .hs__bar { display: none; }
+  }
+
+  /* ---------------- SUSTAINABILITY ---------------- */
+  .sus__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 7rem); align-items: center; }
+  .sus__media { position: relative; padding-bottom: 4rem; }
+  .sus__img { aspect-ratio: 3 / 4; }
+  .sus__px { position: absolute; inset: -8% 0; }
+  .sus__px :global(picture), .sus__px :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .sus__img2 { position: absolute; width: 42%; aspect-ratio: 3 / 4; right: -2rem; bottom: 0; border: 6px solid var(--paper); }
+  .sus__text { display: grid; gap: 1.6rem; }
+  .sus__practices { padding: 1.6rem 0; border-block: 1px solid var(--line-light); display: grid; gap: 0.6rem; }
+  .sus__icons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .sus__icons li { display: grid; gap: 0.8rem; padding: 1.2rem; background: var(--bone); font-weight: 600; font-size: var(--fs-sm); }
+  .sus__icons :global(svg) { color: var(--gold-3); }
+  .sus__commit { font-size: var(--fs-sm); }
+  .sus__commit strong { color: var(--ink); }
+  @media (max-width: 1023px) { .sus__grid { grid-template-columns: 1fr; } .sus__img2 { right: 0; } .sus__media { max-width: 620px; } }
+  @media (max-width: 480px) { .sus__icons { grid-template-columns: 1fr; } }
+
+  /* ---------------- PRESENCE ---------------- */
+  .offices { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); margin-bottom: clamp(3rem, 6vw, 5rem); }
+  .office {
+    background: var(--paper); padding: clamp(1.6rem, 3vw, 2.6rem); display: grid; gap: 1rem;
+    border: 1px solid var(--line-light); transition: border-color 0.5s, transform 0.6s var(--ease-out);
+  }
+  .office:hover { border-color: var(--gold); transform: translateY(-4px); }
+  .office__top { display: flex; justify-content: space-between; }
+  .office__country { font-size: clamp(2.6rem, 1.6rem + 4vw, 5.5rem); font-weight: 700; font-variation-settings: 'wdth' 115; text-transform: uppercase; letter-spacing: -0.045em; line-height: 0.9; }
+  .office__addr { font-size: var(--fs-lg); }
+  .office__links { display: flex; flex-wrap: wrap; gap: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line-light); font-size: var(--fs-sm); }
+  .people { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+  .person { display: grid; gap: 0.6rem; }
+  .person__img { aspect-ratio: 1; margin-bottom: 0.6rem; }
+  .person__img :global(img) { filter: grayscale(1) contrast(1.05); transition: filter 0.8s, transform 1.2s var(--ease-out); }
+  .person:hover .person__img :global(img) { filter: grayscale(0); transform: scale(1.04); }
+  .person__name { font-size: 1.25rem; font-weight: 600; }
+  .gold-3 { color: var(--gold-3); }
+  @media (max-width: 860px) { .offices { grid-template-columns: 1fr; } .people { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .people { grid-template-columns: 1fr; } }
+
+  /* ---------------- FAQ ---------------- */
+  .faq-sec__grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+  .faq-sec__head { display: grid; gap: 1.5rem; justify-items: start; position: sticky; top: calc(var(--header-h) + 2rem); }
+  @media (max-width: 1023px) { .faq-sec__grid { grid-template-columns: 1fr; } .faq-sec__head { position: static; } }
+</style>

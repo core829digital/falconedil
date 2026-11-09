@@ -1,0 +1,206 @@
+---
+import { Image } from 'astro:assets';
+import { nav, company, offices, images } from '../data/site';
+import Icon from './Icon.astro';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="hdr" data-header>
+  <div class="hdr__bar container">
+    <a href="/" class="brand" aria-label="Falcon Edil — Home">
+      <Image src={images.emblem} alt="" width={52} height={60} class="brand__emblem" loading="eager" />
+      <span class="brand__word">
+        <span class="brand__name">Falcon<span>Edil</span></span>
+        <span class="brand__sub">Costruzioni edili</span>
+      </span>
+    </a>
+
+    <nav class="hdr__nav" aria-label="Navigazione principale">
+      <ul role="list">
+        {nav.slice(1).map((item) => (
+          <li>
+            <a href={item.href} class="roll" aria-current={isActive(item.href) ? 'page' : undefined}>
+              <span class="roll__in" data-text={item.label}>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="hdr__actions">
+      <a href={offices[0].phoneHref} class="hdr__phone mono" aria-label={`Chiama ${offices[0].phone}`}>
+        <Icon name="phone" size={16} />
+        <span>{offices[0].phone}</span>
+      </a>
+      <a href="/contatti/#preventivo" class="btn btn--gold hdr__cta" data-magnetic>
+        <span>Preventivo</span>
+      </a>
+      <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
+        <span class="sr-only">Apri il menu</span>
+        <span class="burger" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu theme-dark" id="menu" data-menu hidden>
+  <div class="menu__inner container">
+    <nav aria-label="Menu mobile">
+      <ol class="menu__list" role="list">
+        {nav.map((item, i) => (
+          <li>
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+              <span class="menu__label">{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+    <div class="menu__foot">
+      {offices.map((o) => (
+        <div>
+          <p class="mono gold">{o.country}</p>
+          <a href={o.phoneHref}>{o.phone}</a>
+        </div>
+      ))}
+      <div>
+        <p class="mono gold">Email</p>
+        <a href={`mailto:${company.email}`}>{company.email}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hdr {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    color: var(--bone);
+    transition: transform 0.6s var(--ease-out), color 0.4s, background-color 0.4s, box-shadow 0.4s;
+  }
+  .hdr::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(15, 14, 12, 0.55), transparent);
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .hdr.is-solid {
+    background: rgba(248, 245, 239, 0.88);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    color: var(--ink);
+    box-shadow: 0 1px 0 var(--line-light);
+  }
+  .hdr.is-solid::before { opacity: 0; }
+  .hdr.is-hidden { transform: translateY(-100%); }
+  .hdr.menu-open { color: var(--bone); background: transparent; box-shadow: none; transform: none; }
+  .hdr.menu-open::before { opacity: 0; }
+
+  .hdr__bar {
+    position: relative;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .brand { display: inline-flex; align-items: center; gap: 0.75rem; }
+  .brand__emblem { width: 40px; height: auto; filter: drop-shadow(0 2px 6px rgba(0,0,0,.25)); }
+  .brand__word { display: flex; flex-direction: column; line-height: 1; }
+  .brand__name {
+    font-weight: 750;
+    font-variation-settings: 'wdth' 118;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: 1.15rem;
+  }
+  .brand__name span { color: var(--gold); margin-left: 0.28em; }
+  .brand__sub {
+    font-family: var(--f-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-top: 0.35rem;
+  }
+
+  .hdr__nav ul { display: flex; gap: clamp(1.2rem, 2.4vw, 2.6rem); }
+  .roll {
+    display: inline-block;
+    overflow: hidden;
+    font-size: var(--fs-sm);
+    font-weight: 550;
+    letter-spacing: 0.02em;
+    position: relative;
+    padding-block: 0.4rem;
+  }
+  .roll__in { display: inline-block; position: relative; transition: transform 0.6s var(--ease-out); }
+  .roll__in::after {
+    content: attr(data-text);
+    position: absolute; left: 0; top: 100%;
+    color: var(--gold);
+    padding-top: 0.4rem;
+  }
+  .roll:hover .roll__in { transform: translateY(calc(-100% - 0.4rem)); }
+  .roll[aria-current='page']::before {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--gold);
+  }
+
+  .hdr__actions { display: flex; align-items: center; gap: 1.25rem; }
+  .hdr__phone { display: inline-flex; align-items: center; gap: 0.5rem; opacity: 0.85; transition: opacity 0.3s; }
+  .hdr__phone:hover { opacity: 1; color: var(--gold); }
+  .hdr__cta { min-height: 2.9rem; padding-inline: 1.3rem; }
+
+  .hdr__burger { display: none; width: 2.9rem; height: 2.9rem; place-items: center; border-radius: 50%; box-shadow: inset 0 0 0 1px currentColor; }
+  .burger { position: relative; width: 18px; height: 8px; display: block; }
+  .burger i { position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor; transition: transform 0.5s var(--ease-out), top 0.5s var(--ease-out); }
+  .burger i:first-child { top: 0; }
+  .burger i:last-child { top: 6.5px; }
+  [aria-expanded='true'] .burger i:first-child { top: 3.25px; transform: rotate(45deg); }
+  [aria-expanded='true'] .burger i:last-child { top: 3.25px; transform: rotate(-45deg); }
+
+  @media (max-width: 1100px) {
+    .hdr__phone span { display: none; }
+  }
+  @media (max-width: 960px) {
+    .hdr__nav, .hdr__phone { display: none; }
+    .hdr__burger { display: grid; }
+  }
+  @media (max-width: 480px) {
+    .hdr__cta { display: none; }
+    .brand__emblem { width: 34px; }
+  }
+
+  /* Menu overlay */
+  .menu {
+    position: fixed; inset: 0; z-index: 90;
+    background: var(--ink);
+    padding-top: calc(var(--header-h) + 2rem);
+    padding-bottom: 2rem;
+    display: flex;
+    clip-path: inset(0 0 100% 0);
+    overflow-y: auto;
+  }
+  .menu[hidden] { display: none; }
+  .menu__inner { display: flex; flex-direction: column; justify-content: space-between; gap: 3rem; min-height: 100%; }
+  .menu__list li { border-bottom: 1px solid var(--line-dark); overflow: hidden; }
+  .menu__list a { display: flex; align-items: baseline; gap: 1.25rem; padding-block: 1rem; }
+  .menu__list .mono { color: var(--gold-2); }
+  .menu__label {
+    font-size: clamp(2.2rem, 9vw, 4.2rem);
+    font-weight: 650;
+    font-variation-settings: 'wdth' 110;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .menu__list a[aria-current='page'] .menu__label { color: var(--gold); }
+  .menu__foot { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+  .menu__foot p { margin-bottom: 0.35rem; }
+</style>

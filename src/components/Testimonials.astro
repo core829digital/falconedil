@@ -1,0 +1,38 @@
+---
+import { Image } from 'astro:assets';
+import { testimonials } from '../data/site';
+import Icon from './Icon.astro';
+---
+<ul class="tst" role="list" data-reveal="stagger">
+  {testimonials.map((t, i) => (
+    <li class:list={['tst__card', { 'tst__card--offset': i % 2 === 1 }]}>
+      <Icon name="quote" size={30} class="tst__q" />
+      <blockquote><p>{t.quote}</p></blockquote>
+      <div class="tst__who">
+        <Image src={t.image} alt="" width={56} height={56} class="tst__avatar" />
+        <div>
+          <p class="tst__name">{t.name}</p>
+          <p class="mono muted">{t.role} · {t.place}</p>
+        </div>
+      </div>
+    </li>
+  ))}
+</ul>
+<style>
+  .tst { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gutter); }
+  .tst__card {
+    display: flex; flex-direction: column; gap: 1.6rem;
+    padding: clamp(1.6rem, 3vw, 2.8rem);
+    background: var(--ink-2);
+    border: 1px solid var(--line-dark);
+    transition: border-color 0.5s, transform 0.6s var(--ease-out);
+  }
+  .tst__card:hover { border-color: rgba(192,138,53,.6); transform: translateY(-4px); }
+  .tst__card--offset { margin-top: clamp(0rem, 6vw, 5rem); }
+  .tst__q { color: var(--gold); }
+  blockquote p { font-family: var(--f-serif); font-size: clamp(1.25rem, 1rem + 0.8vw, 1.7rem); line-height: 1.32; }
+  .tst__who { display: flex; align-items: center; gap: 1rem; margin-top: auto; padding-top: 1.4rem; border-top: 1px solid var(--line-dark); }
+  .tst__avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; filter: grayscale(0.3); }
+  .tst__name { font-weight: 600; }
+  @media (max-width: 860px) { .tst { grid-template-columns: 1fr; } .tst__card--offset { margin-top: 0; } }
+</style>
